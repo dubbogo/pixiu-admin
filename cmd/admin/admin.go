@@ -101,14 +101,11 @@ func newAdminApp(startCmd *cli.Command) *cli.App {
 	return app
 }
 
-
-
 func main() {
 	app := newAdminApp(&cmdStart)
 	// ignore error so we don't exit non-zero and break gfmrun README example tests
 	_ = app.Run(os.Args)
 }
-
 
 // Start start init etcd client and start admin http server
 func Start() {
@@ -236,8 +233,8 @@ func ModifyBaseInfo(c *gin.Context) {
 
 // GetResourceDetail get resource detail with yml
 func GetResourceDetail(c *gin.Context) {
-	path := c.Query("path")
-	res, err := logic.BizGetResourceDetail(path)
+	id := c.Query("resourceId")
+	res, err := logic.BizGetResourceDetail(id)
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
 		return
@@ -247,9 +244,9 @@ func GetResourceDetail(c *gin.Context) {
 
 // GetMethodDetail get method detail with yml
 func GetMethodDetail(c *gin.Context) {
-	path := c.Query("path")
-	method := c.Query("method")
-	res, err := logic.BizGetMethodDetail(path, method)
+	resourceId := c.Query("resourceId")
+	methodId := c.Query("methodId")
+	res, err := logic.BizGetMethodDetail(resourceId, methodId)
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
 		return
@@ -301,8 +298,8 @@ func ModifyResourceInfo(c *gin.Context) {
 
 // DeleteResourceInfo delete resource
 func DeleteResourceInfo(c *gin.Context) {
-	path := c.Query("path")
-	err := logic.BizDeleteResourceInfo(path)
+	id := c.Query("resourceId")
+	err := logic.BizDeleteResourceInfo(id)
 
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
@@ -312,9 +309,9 @@ func DeleteResourceInfo(c *gin.Context) {
 
 // DeleteResourceInfo delete method
 func DeleteMethodInfo(c *gin.Context) {
-	path := c.Query("path")
-	method := c.Query("method")
-	err := logic.BizDeleteMethodInfo(path, method)
+	resourceId := c.Query("resourceId")
+	methodId := c.Query("methodId")
+	err := logic.BizDeleteMethodInfo(resourceId, methodId)
 
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
@@ -325,7 +322,7 @@ func DeleteMethodInfo(c *gin.Context) {
 // SetMethodInfo create method
 func SetMethodInfo(c *gin.Context) {
 	body := c.PostForm("content")
-	path := c.Query("path")
+	resourceId := c.Query("resourceId")
 
 	res := &fc.Method{}
 	err := yaml.UnmarshalYML([]byte(body), res)
@@ -336,7 +333,7 @@ func SetMethodInfo(c *gin.Context) {
 		return
 	}
 
-	setErr := logic.BizSetResourceMethod(path, res, true)
+	setErr := logic.BizSetResourceMethod(resourceId, res, true)
 
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(err))
@@ -347,7 +344,7 @@ func SetMethodInfo(c *gin.Context) {
 // ModifyMethodInfo modify method
 func ModifyMethodInfo(c *gin.Context) {
 	body := c.PostForm("content")
-	path := c.Query("path")
+	resourceId := c.Query("resourceId")
 
 	res := &fc.Method{}
 	err := yaml.UnmarshalYML([]byte(body), res)
@@ -358,7 +355,7 @@ func ModifyMethodInfo(c *gin.Context) {
 		return
 	}
 
-	setErr := logic.BizSetResourceMethod(path, res, false)
+	setErr := logic.BizSetResourceMethod(resourceId, res, false)
 
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(err))

@@ -1,7 +1,9 @@
 package logic
 
 import (
-	"strings"
+	"errors"
+	gxetcd "github.com/dubbogo/gost/database/kv/etcd/v3"
+	"strconv"
 )
 
 import (
@@ -17,7 +19,10 @@ import (
 
 const Base = "base"
 const Resources = "Resources"
+const ResourceId = "ResourceId"
+const MethodId = "MethodId"
 const PluginGroup = "pluginGroup"
+const ErrID = -1
 
 // BizSetBaseInfo business layer create base info
 func BizSetBaseInfo(info *config.BaseInfo, created bool) error {
@@ -58,8 +63,8 @@ func BizGetBaseInfo() (*config.BaseInfo, error) {
 }
 
 // BizGetResourceDetail business layer get resource detail
-func BizGetResourceDetail(path string) (string, error) {
-	key := getResourceKey(path)
+func BizGetResourceDetail(id string) (string, error) {
+	key := getResourceKey(id)
 	detail, err := config.Client.Get(key)
 	if err != nil {
 		logger.Errorf("BizGetResourceDetail err, %v\n", err)
@@ -69,8 +74,8 @@ func BizGetResourceDetail(path string) (string, error) {
 }
 
 // BizGetMethodDetail business layer get method detail
-func BizGetMethodDetail(path string, method string) (string, error) {
-	key := getMethodKey(path, method)
+func BizGetMethodDetail(resourceId string, methodId string) (string, error) {
+	key := getMethodKey(resourceId, methodId)
 	detail, err := config.Client.Get(key)
 	if err != nil {
 		logger.Errorf("BizGetResourceDetail err, %v\n", err)
@@ -158,7 +163,7 @@ func BizGetPluginGroupDetail(name string) (string, error) {
 }
 
 func getResourceKey(path string) string {
-	return getRootPath(Resources) + "/" + strings.Replace(path, "/", "_", -1)
+	return getRootPath(Resources) + "/" + path
 }
 
 func getPluginGroupKey(name string) string {
@@ -170,7 +175,7 @@ func getPluginGroupPrefixKey() string {
 }
 
 func getResourceMethodPrefixKey(path string) string {
-	return getResourceKey(path) + "/" + "method"
+	return getResourceKey(path) + "/" + "Method"
 }
 
 func getMethodKey(path string, method string) string {
@@ -180,27 +185,38 @@ func getMethodKey(path string, method string) string {
 // BizSetResourceInfo business layer create resource
 func BizSetResourceInfo(res *fc.Resource, created bool) error {
 
+	// 备份 method
 	methods := res.Methods
-	// 创建 methods
-	BizCreateResourceMethod(getResourceMethodPrefixKey(res.Path), methods)
-	// 创建resource
 	res.Methods = nil
-	data, _ := yaml.MarshalYML(res)
+	// 创建 resource
+
 	if created {
-		setErr := config.Client.Create(getResourceKey(res.Path), string(data))
+		// 填充 id
+		res.Id = getResourceId()
+		if res.Id == ErrID {
+			logger.Warnf("can't get id from etcd")
+			return perrors.New("BizSetResourceInfo error can't get id from etcd")
+		}
+		data, _ := yaml.MarshalYML(res)
+
+		setErr := config.Client.Create(getResourceKey(strconv.Itoa(res.Id)), string(data))
 
 		if setErr != nil {
-			logger.Warnf("update etcd error, %v\n", setErr)
+			logger.Warnf("Create etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
 		}
 	} else {
-		setErr := config.Client.Update(getResourceKey(res.Path), string(data))
+		data, _ := yaml.MarshalYML(res)
+		setErr := config.Client.Update(getResourceKey(strconv.Itoa(res.Id)), string(data))
 
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
 		}
 	}
+
+	// 创建 methods
+	BizCreateResourceMethod(strconv.Itoa(res.Id), methods)
 
 	return nil
 }
@@ -229,8 +245,8 @@ func BizSetPluginGroupInfo(res *fc.PluginsGroup, created bool) error {
 }
 
 // BizDeleteResourceInfo business layer delete resource
-func BizDeleteResourceInfo(path string) error {
-	key := getResourceKey(path)
+func BizDeleteResourceInfo(id string) error {
+	key := getResourceKey(id)
 	err := config.Client.Delete(key)
 	if err != nil {
 		logger.Warnf("BizDeleteResourceInfo, %v\n", err)
@@ -240,8 +256,8 @@ func BizDeleteResourceInfo(path string) error {
 }
 
 // BizDeleteMethodInfo business layer delete method
-func BizDeleteMethodInfo(path string, method string) error {
-	key := getMethodKey(path, method)
+func BizDeleteMethodInfo(resourceId string, methodId string) error {
+	key := getMethodKey(resourceId, methodId)
 	err := config.Client.Delete(key)
 	if err != nil {
 		logger.Warnf("BizDeleteMethodInfo, %v\n", err)
@@ -262,7 +278,7 @@ func BizDeletePluginGroupInfo(name string) error {
 }
 
 // BizCreateResourceMethod batch create method below specific path
-func BizCreateResourceMethod(path string, methods []fc.Method) error {
+func BizCreateResourceMethod(resourceId string, methods []fc.Method) error {
 
 	if len(methods) == 0 {
 		return nil
@@ -271,7 +287,12 @@ func BizCreateResourceMethod(path string, methods []fc.Method) error {
 	var kList, vList []string
 
 	for _, method := range methods {
-		kList = append(kList, getMethodKey(path, string(method.HTTPVerb)))
+		method.Id = getMethodId()
+		if method.Id == ErrID {
+			logger.Warnf("can't get id from etcd")
+			continue
+		}
+		kList = append(kList, getMethodKey(resourceId, strconv.Itoa(method.Id)))
 		data, _ := yaml.MarshalYML(method)
 		vList = append(vList, string(data))
 	}
@@ -285,19 +306,27 @@ func BizCreateResourceMethod(path string, methods []fc.Method) error {
 }
 
 // BizSetResourceMethod batch create method below specific path
-func BizSetResourceMethod(path string, method *fc.Method, created bool) error {
+func BizSetResourceMethod(resourceId string, method *fc.Method, created bool) error {
 
-	key := getMethodKey(path, string(method.HTTPVerb))
-	data, _ := yaml.MarshalYML(method)
 	if created {
-		// 需要判断是创建还是修改
+
+		method.Id = getMethodId()
+		key := getMethodKey(resourceId, strconv.Itoa(method.Id))
+
+		if method.Id == ErrID {
+			logger.Warnf("can't get id from etcd")
+			return perrors.New("BizSetResourceMethod error can't get id from etcd")
+		}
+		data, _ := yaml.MarshalYML(method)
+
 		err := config.Client.Create(key, string(data))
 		if err != nil {
 			logger.Warnf("BizSetResourceMethod etcd error, %v\n", err)
 			return perrors.WithMessage(err, "BizSetResourceMethod error")
 		}
 	} else {
-		// 需要判断是创建还是修改
+		data, _ := yaml.MarshalYML(method)
+		key := getMethodKey(resourceId, strconv.Itoa(method.Id))
 		err := config.Client.Update(key, string(data))
 		if err != nil {
 			logger.Warnf("BizSetResourceMethod etcd error, %v\n", err)
@@ -306,6 +335,66 @@ func BizSetResourceMethod(path string, method *fc.Method, created bool) error {
 	}
 
 	return nil
+}
+
+func getResourceId() int {
+	return loopGetId(getRootPath(ResourceId))
+}
+
+func getMethodId() int {
+	return loopGetId(getRootPath(MethodId))
+}
+
+func loopGetId(k string) int {
+
+	for true {
+
+		rawClient := config.Client.GetRawClient()
+		if rawClient == nil {
+			logger.Error("getResourceId etcd client is null")
+			return ErrID
+		}
+
+		resp, err := rawClient.Get(config.Client.GetCtx(), k)
+		if err != nil {
+			return ErrID
+		}
+
+		var val string
+		var rev int64
+		if len(resp.Kvs) != 0 {
+			val = string(resp.Kvs[0].Value)
+			rev = resp.Kvs[0].ModRevision
+		} else {
+			val = "0"
+			rev = 0
+		}
+		id, err := strconv.Atoi(val)
+
+		if err != nil {
+			logger.Error("getResourceId Atoi error, %v\n", err)
+			return ErrID
+		}
+
+		id += 1
+
+		if rev == 0 {
+			err = config.Client.Create(k, strconv.Itoa(id))
+		} else {
+			err = config.Client.UpdateWithRev(k, strconv.Itoa(id), rev)
+		}
+
+		if err != nil {
+			if !errors.Is(err, gxetcd.ErrCompareFail) {
+				logger.Error("getResourceId UpdateWithRev error, %v\n", err)
+				return ErrID
+			}
+			logger.Info("retry get id")
+		} else {
+			return id
+		}
+	}
+	return ErrID
 }
 
 func getRootPath(key string) string {

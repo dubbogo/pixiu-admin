@@ -8,14 +8,14 @@ import (
 
 import (
 	getty "github.com/apache/dubbo-getty"
-	"github.com/coreos/etcd/embed"
 	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
+	"go.etcd.io/etcd/embed"
 )
 
 import (
-	"github.com/apache/dubbo-go-pixiu/pkg/common/yaml"
+	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
 )
 
 const defaultEtcdV3WorkDir = "/tmp/default-pixiu-admin.etcd"
