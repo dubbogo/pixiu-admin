@@ -16,4 +16,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-replace github.com/dubbogo/dubbo-go-pixiu-filter => ../../dubbo-go-pixiu-filter
+replace github.com/dubbogo/dubbo-go-pixiu-filter => ../dubbo-go-pixiu-filter

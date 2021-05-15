@@ -167,7 +167,7 @@ func GetResourceList(c *gin.Context) {
 
 // GetResourceList get all resource list
 func GetMethodList(c *gin.Context) {
-	path := c.Query("path")
+	path := c.Query("resourceId")
 
 	res, err := logic.BizGetMethodList(path)
 	if err != nil {

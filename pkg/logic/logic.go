@@ -192,14 +192,14 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 
 	if created {
 		// 填充 id
-		res.Id = getResourceId()
-		if res.Id == ErrID {
+		res.ID = getResourceId()
+		if res.ID == ErrID {
 			logger.Warnf("can't get id from etcd")
 			return perrors.New("BizSetResourceInfo error can't get id from etcd")
 		}
 		data, _ := yaml.MarshalYML(res)
 
-		setErr := config.Client.Create(getResourceKey(strconv.Itoa(res.Id)), string(data))
+		setErr := config.Client.Create(getResourceKey(strconv.Itoa(res.ID)), string(data))
 
 		if setErr != nil {
 			logger.Warnf("Create etcd error, %v\n", setErr)
@@ -207,7 +207,7 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 		}
 	} else {
 		data, _ := yaml.MarshalYML(res)
-		setErr := config.Client.Update(getResourceKey(strconv.Itoa(res.Id)), string(data))
+		setErr := config.Client.Update(getResourceKey(strconv.Itoa(res.ID)), string(data))
 
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
@@ -216,7 +216,7 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 	}
 
 	// 创建 methods
-	BizCreateResourceMethod(strconv.Itoa(res.Id), methods)
+	BizCreateResourceMethod(strconv.Itoa(res.ID), methods)
 
 	return nil
 }
@@ -287,12 +287,12 @@ func BizCreateResourceMethod(resourceId string, methods []fc.Method) error {
 	var kList, vList []string
 
 	for _, method := range methods {
-		method.Id = getMethodId()
-		if method.Id == ErrID {
+		method.ID = getMethodId()
+		if method.ID == ErrID {
 			logger.Warnf("can't get id from etcd")
 			continue
 		}
-		kList = append(kList, getMethodKey(resourceId, strconv.Itoa(method.Id)))
+		kList = append(kList, getMethodKey(resourceId, strconv.Itoa(method.ID)))
 		data, _ := yaml.MarshalYML(method)
 		vList = append(vList, string(data))
 	}
@@ -310,10 +310,10 @@ func BizSetResourceMethod(resourceId string, method *fc.Method, created bool) er
 
 	if created {
 
-		method.Id = getMethodId()
-		key := getMethodKey(resourceId, strconv.Itoa(method.Id))
+		method.ID = getMethodId()
+		key := getMethodKey(resourceId, strconv.Itoa(method.ID))
 
-		if method.Id == ErrID {
+		if method.ID == ErrID {
 			logger.Warnf("can't get id from etcd")
 			return perrors.New("BizSetResourceMethod error can't get id from etcd")
 		}
@@ -326,7 +326,7 @@ func BizSetResourceMethod(resourceId string, method *fc.Method, created bool) er
 		}
 	} else {
 		data, _ := yaml.MarshalYML(method)
-		key := getMethodKey(resourceId, strconv.Itoa(method.Id))
+		key := getMethodKey(resourceId, strconv.Itoa(method.ID))
 		err := config.Client.Update(key, string(data))
 		if err != nil {
 			logger.Warnf("BizSetResourceMethod etcd error, %v\n", err)
