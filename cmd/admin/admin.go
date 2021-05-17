@@ -38,6 +38,15 @@ import (
 	logic "github.com/dubbogo/pixiu-admin/pkg/logic"
 )
 
+// Version admin version
+const Version = "0.1.0"
+const OK = "10001"
+const ERR = "10002"
+const RETRY = "10003"
+
+const ResourceId = "resourceId"
+const MethodId = "methodId"
+
 var (
 	cmdStart = cli.Command{
 		Name:  "start",
@@ -72,8 +81,6 @@ var (
 	}
 )
 
-// Version admin version
-const Version = "0.1.0"
 
 func newAdminApp(startCmd *cli.Command) *cli.App {
 	app := cli.NewApp()
@@ -111,7 +118,10 @@ func main() {
 func Start() {
 	config.InitEtcdClient()
 	r := SetupRouter()
-	r.Run(config.Bootstrap.GetAddress()) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	err := r.Run(config.Bootstrap.GetAddress())
+	if err != nil {
+		logger.Errorf(err.Error())
+	}
 }
 
 func Stop() {
@@ -126,12 +136,12 @@ func SetupRouter() *gin.Engine {
 	r.PUT("/config/api/base/", SetBaseInfo)
 	r.GET("/config/api/resource/list", GetResourceList)
 	r.GET("/config/api/resource/detail", GetResourceDetail)
-	r.POST("/config/api/resource", SetResourceInfo)
+	r.POST("/config/api/resource", CreateResourceInfo)
 	r.PUT("/config/api/resource", ModifyResourceInfo)
 	r.DELETE("/config/api/resource", DeleteResourceInfo)
 	r.GET("/config/api/resource/method/list", GetMethodList)
 	r.GET("/config/api/resource/method/detail", GetMethodDetail)
-	r.POST("/config/api/resource/method", SetMethodInfo)
+	r.POST("/config/api/resource/method", CreateMethodInfo)
 	r.PUT("/config/api/resource/method", ModifyMethodInfo)
 	r.DELETE("/config/api/resource/method", DeleteMethodInfo)
 	r.GET("/config/api/plugin_group/list", GetPluginGroupList)
@@ -143,15 +153,37 @@ func SetupRouter() *gin.Engine {
 	return r
 }
 
-const OK = "10001"
-const ERR = "10002"
-
-func WithError(err error) config.RetData {
-	return config.RetData{ERR, err.Error()}
+// GetBaseInfo get pixiu base info such as name,desc
+func GetBaseInfo(c *gin.Context) {
+	conf, err := logic.BizGetBaseInfo()
+	if err != nil {
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+	data, _ := yaml.MarshalYML(conf)
+	c.JSON(http.StatusOK, WithRet(string(data)))
 }
 
-func WithRet(data interface{}) config.RetData {
-	return config.RetData{OK, data}
+// SetBaseInfo modify pixiu base info such as name,desc
+func SetBaseInfo(c *gin.Context) {
+	body := c.PostForm("content")
+
+	baseInfo := &config.BaseInfo{}
+	err := yaml.UnmarshalYML([]byte(body), baseInfo)
+
+	if err != nil {
+		logger.Warnf("read body err, %v\n", err)
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+
+	setErr := logic.BizSetBaseInfo(baseInfo, true)
+
+	if setErr != nil {
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
+	}
+	c.JSON(http.StatusOK, WithRet("success"))
 }
 
 // GetResourceList get all resource list
@@ -165,75 +197,9 @@ func GetResourceList(c *gin.Context) {
 	c.JSON(http.StatusOK, WithRet(string(data)))
 }
 
-// GetResourceList get all resource list
-func GetMethodList(c *gin.Context) {
-	path := c.Query("resourceId")
-
-	res, err := logic.BizGetMethodList(path)
-	if err != nil {
-		c.JSON(http.StatusOK, WithError(err))
-		return
-	}
-	data, _ := json.Marshal(res)
-	c.JSON(http.StatusOK, WithRet(string(data)))
-}
-
-// SetBaseInfo handle create base info http request
-func SetBaseInfo(c *gin.Context) {
-	body := c.PostForm("content")
-
-	baseInfo := &config.BaseInfo{}
-	err := yaml.UnmarshalYML([]byte(body), baseInfo)
-
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	setErr := logic.BizSetBaseInfo(baseInfo, true)
-
-	if setErr != nil {
-		c.String(http.StatusOK, err.Error())
-	}
-	c.String(http.StatusOK, "success")
-}
-
-// GetBaseInfo business layer get base info
-func GetBaseInfo(c *gin.Context) {
-	config, err := logic.BizGetBaseInfo()
-	if err != nil {
-		c.JSON(http.StatusOK, WithError(err))
-		return
-	}
-	data, _ := yaml.MarshalYML(config)
-	c.JSON(http.StatusOK, WithRet(string(data)))
-}
-
-// ModifyBaseInfo handle modify base info http request
-func ModifyBaseInfo(c *gin.Context) {
-	body := c.PostForm("content")
-
-	baseInfo := &config.BaseInfo{}
-	err := yaml.UnmarshalYML([]byte(body), baseInfo)
-
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	setErr := logic.BizSetBaseInfo(baseInfo, false)
-
-	if setErr != nil {
-		c.String(http.StatusOK, err.Error())
-	}
-	c.String(http.StatusOK, "success")
-}
-
 // GetResourceDetail get resource detail with yml
 func GetResourceDetail(c *gin.Context) {
-	id := c.Query("resourceId")
+	id := c.Query(ResourceId)
 	res, err := logic.BizGetResourceDetail(id)
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
@@ -242,20 +208,8 @@ func GetResourceDetail(c *gin.Context) {
 	c.JSON(http.StatusOK, WithRet(res))
 }
 
-// GetMethodDetail get method detail with yml
-func GetMethodDetail(c *gin.Context) {
-	resourceId := c.Query("resourceId")
-	methodId := c.Query("methodId")
-	res, err := logic.BizGetMethodDetail(resourceId, methodId)
-	if err != nil {
-		c.JSON(http.StatusOK, WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, WithRet(res))
-}
-
-// SetResourceInfo create resource
-func SetResourceInfo(c *gin.Context) {
+// CreateResourceInfo create resource
+func CreateResourceInfo(c *gin.Context) {
 	body := c.PostForm("content")
 
 	res := &fc.Resource{}
@@ -270,7 +224,8 @@ func SetResourceInfo(c *gin.Context) {
 	setErr := logic.BizSetResourceInfo(res, true)
 
 	if setErr != nil {
-		c.JSON(http.StatusOK, WithError(err))
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
 }
@@ -291,38 +246,66 @@ func ModifyResourceInfo(c *gin.Context) {
 	setErr := logic.BizSetResourceInfo(res, false)
 
 	if setErr != nil {
-		c.JSON(http.StatusOK, WithError(err))
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
 }
 
 // DeleteResourceInfo delete resource
 func DeleteResourceInfo(c *gin.Context) {
-	id := c.Query("resourceId")
+	id := c.Query(ResourceId)
 	err := logic.BizDeleteResourceInfo(id)
 
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
+}
+
+// GetMethodList get all method list below one resource
+func GetMethodList(c *gin.Context) {
+	resourceId := c.Query(ResourceId)
+
+	res, err := logic.BizGetMethodList(resourceId)
+	if err != nil {
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+	data, _ := json.Marshal(res)
+	c.JSON(http.StatusOK, WithRet(string(data)))
+}
+
+// GetMethodDetail get method detail with yml
+func GetMethodDetail(c *gin.Context) {
+	resourceId := c.Query(ResourceId)
+	methodId := c.Query(MethodId)
+	res, err := logic.BizGetMethodDetail(resourceId, methodId)
+	if err != nil {
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+	c.JSON(http.StatusOK, WithRet(res))
 }
 
 // DeleteResourceInfo delete method
 func DeleteMethodInfo(c *gin.Context) {
-	resourceId := c.Query("resourceId")
-	methodId := c.Query("methodId")
+	resourceId := c.Query(ResourceId)
+	methodId := c.Query(MethodId)
 	err := logic.BizDeleteMethodInfo(resourceId, methodId)
 
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
 }
 
-// SetMethodInfo create method
-func SetMethodInfo(c *gin.Context) {
+// CreateMethodInfo create method
+func CreateMethodInfo(c *gin.Context) {
 	body := c.PostForm("content")
-	resourceId := c.Query("resourceId")
+	resourceId := c.Query(ResourceId)
 
 	res := &fc.Method{}
 	err := yaml.UnmarshalYML([]byte(body), res)
@@ -336,7 +319,8 @@ func SetMethodInfo(c *gin.Context) {
 	setErr := logic.BizSetResourceMethod(resourceId, res, true)
 
 	if setErr != nil {
-		c.JSON(http.StatusOK, WithError(err))
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
 }
@@ -344,7 +328,7 @@ func SetMethodInfo(c *gin.Context) {
 // ModifyMethodInfo modify method
 func ModifyMethodInfo(c *gin.Context) {
 	body := c.PostForm("content")
-	resourceId := c.Query("resourceId")
+	resourceId := c.Query(ResourceId)
 
 	res := &fc.Method{}
 	err := yaml.UnmarshalYML([]byte(body), res)
@@ -358,7 +342,8 @@ func ModifyMethodInfo(c *gin.Context) {
 	setErr := logic.BizSetResourceMethod(resourceId, res, false)
 
 	if setErr != nil {
-		c.JSON(http.StatusOK, WithError(err))
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
 }
@@ -374,7 +359,7 @@ func GetPluginGroupList(c *gin.Context) {
 	c.JSON(http.StatusOK, WithRet(string(data)))
 }
 
-// GetPluginGroupDetail get plugin group list
+// GetPluginGroupDetail get plugin group detail
 func GetPluginGroupDetail(c *gin.Context) {
 	name := c.Query("name")
 
@@ -402,7 +387,8 @@ func CreatePluginGroup(c *gin.Context) {
 	setErr := logic.BizSetPluginGroupInfo(res, true)
 
 	if setErr != nil {
-		c.JSON(http.StatusOK, WithError(err))
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
 }
@@ -420,10 +406,11 @@ func ModifyPluginGroup(c *gin.Context) {
 		return
 	}
 
-	setErr := logic.BizSetPluginGroupInfo(res, true)
+	setErr := logic.BizSetPluginGroupInfo(res, false)
 
 	if setErr != nil {
-		c.JSON(http.StatusOK, WithError(err))
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
 }
@@ -435,6 +422,17 @@ func DeletePluginGroup(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
+		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
+}
+
+// WithError transform err to RetData
+func WithError(err error) config.RetData {
+	return config.RetData{ERR, err.Error()}
+}
+
+// WithRet transform data to RetData
+func WithRet(data interface{}) config.RetData {
+	return config.RetData{OK, data}
 }
