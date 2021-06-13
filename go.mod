@@ -3,7 +3,7 @@ module github.com/dubbogo/pixiu-admin
 go 1.14
 
 require (
-	github.com/dubbogo/dubbo-go-pixiu-filter v0.1.4-0.20210514150956-207303ec4bd4
+	github.com/dubbogo/dubbo-go-pixiu-filter v0.1.4-0.20210613012702-8488bf80772c
 	github.com/dubbogo/gost v1.11.9
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/gin-gonic/gin v1.7.1

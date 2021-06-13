@@ -27,6 +27,7 @@ import (
 
 import (
 	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
+	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
 	"github.com/gin-gonic/gin"
 	"github.com/urfave/cli"
 )
@@ -81,7 +82,6 @@ var (
 	}
 )
 
-
 func newAdminApp(startCmd *cli.Command) *cli.App {
 	app := cli.NewApp()
 	app.Name = "dubbogo pixiu admin"
@@ -134,21 +134,29 @@ func SetupRouter() *gin.Engine {
 	r.GET("/config/api/base", GetBaseInfo)
 	r.POST("/config/api/base/", SetBaseInfo)
 	r.PUT("/config/api/base/", SetBaseInfo)
+
 	r.GET("/config/api/resource/list", GetResourceList)
 	r.GET("/config/api/resource/detail", GetResourceDetail)
 	r.POST("/config/api/resource", CreateResourceInfo)
 	r.PUT("/config/api/resource", ModifyResourceInfo)
 	r.DELETE("/config/api/resource", DeleteResourceInfo)
+
 	r.GET("/config/api/resource/method/list", GetMethodList)
 	r.GET("/config/api/resource/method/detail", GetMethodDetail)
 	r.POST("/config/api/resource/method", CreateMethodInfo)
 	r.PUT("/config/api/resource/method", ModifyMethodInfo)
 	r.DELETE("/config/api/resource/method", DeleteMethodInfo)
+
 	r.GET("/config/api/plugin_group/list", GetPluginGroupList)
 	r.GET("/config/api/plugin_group/detail", GetPluginGroupDetail)
 	r.POST("/config/api/plugin_group", CreatePluginGroup)
 	r.PUT("/config/api/plugin_group", ModifyPluginGroup)
 	r.DELETE("/config/api/plugin_group", DeletePluginGroup)
+
+	r.GET("/config/api/plugin/ratelimit", GetPluginRatelimitDetail)
+	r.POST("/config/api/plugin/ratelimit", CreatePluginRatelimit)
+	r.PUT("/config/api/plugin/ratelimit", ModifyPluginRatelimit)
+	r.DELETE("/config/api/plugin/ratelimit", DeletePluginRatelimit)
 
 	return r
 }
@@ -419,6 +427,71 @@ func ModifyPluginGroup(c *gin.Context) {
 func DeletePluginGroup(c *gin.Context) {
 	name := c.Query("name")
 	err := logic.BizDeletePluginGroupInfo(name)
+
+	if err != nil {
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+	c.JSON(http.StatusOK, WithRet("Success"))
+}
+
+// GetPluginRatelimitDetail get plugin ratelimit detail
+func GetPluginRatelimitDetail(c *gin.Context) {
+	res, err := logic.BizGetPluginRatelimitConfig()
+	if err != nil {
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+	c.JSON(http.StatusOK, WithRet(res))
+}
+
+// CreatePluginRatelimit create plugin ratelimit conf
+func CreatePluginRatelimit(c *gin.Context) {
+	body := c.PostForm("content")
+
+	res := &ratelimit.Config{}
+	err := yaml.UnmarshalYML([]byte(body), res)
+
+	if err != nil {
+		logger.Warnf("read body err, %v\n", err)
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+
+	setErr := logic.BizSetPluginRatelimitInfo(res, true)
+
+	if setErr != nil {
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
+	}
+	c.JSON(http.StatusOK, WithRet("Success"))
+}
+
+// ModifyPluginRatelimit create plugin ratelimit config
+func ModifyPluginRatelimit(c *gin.Context) {
+	body := c.PostForm("content")
+
+	res := &ratelimit.Config{}
+	err := yaml.UnmarshalYML([]byte(body), res)
+
+	if err != nil {
+		logger.Warnf("read body err, %v\n", err)
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+
+	setErr := logic.BizSetPluginRatelimitInfo(res, false)
+
+	if setErr != nil {
+		c.JSON(http.StatusOK, WithError(setErr))
+		return
+	}
+	c.JSON(http.StatusOK, WithRet("Success"))
+}
+
+// BizDeletePluginRatelimit delete plugin ratelimit config
+func DeletePluginRatelimit(c *gin.Context) {
+	err := logic.BizDeletePluginRatelimit()
 
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
