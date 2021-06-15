@@ -24,6 +24,7 @@ import (
 
 import (
 	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
+	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
 	gxetcd "github.com/dubbogo/gost/database/kv/etcd/v3"
 	perrors "github.com/pkg/errors"
 )
@@ -39,8 +40,10 @@ const Resources = "Resources"
 const ResourceId = "ResourceId"
 const MethodId = "MethodId"
 const PluginGroup = "pluginGroup"
-const ErrID = -1
+const Plugin = "plugin"
+const Ratelimit = "ratelimit"
 
+const ErrID = -1
 
 // BizGetBaseInfo get base info
 func BizGetBaseInfo() (*config.BaseInfo, error) {
@@ -262,7 +265,6 @@ func BizDeleteMethodInfo(resourceId string, methodId string) error {
 	return nil
 }
 
-
 // BizGetPluginGroupList get plugin group list
 func BizGetPluginGroupList() ([]fc.PluginsGroup, error) {
 	key := getPluginGroupPrefixKey()
@@ -331,8 +333,57 @@ func BizDeletePluginGroupInfo(name string) error {
 	return nil
 }
 
+// BizGetPluginGroupDetail get plugin group detail
+func BizGetPluginRatelimitConfig() (string, error) {
+	key := getPluginRatelimitKey()
+	detail, err := config.Client.Get(key)
+	if err != nil {
+		logger.Errorf("BizGetPluginRatelimitConfig err, %v\n", err)
+		return "", perrors.WithMessage(err, "BizGetPluginRatelimitConfig error")
+	}
+	return detail, nil
+}
+
+// BizSetPluginGroupInfo create or update plugin group
+func BizSetPluginRatelimitInfo(res *ratelimit.Config, created bool) error {
+
+	data, _ := yaml.MarshalYML(res)
+	if created {
+		setErr := config.Client.Create(getPluginRatelimitKey(), string(data))
+
+		if setErr != nil {
+			logger.Warnf("create etcd error, %v\n", setErr)
+			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
+		}
+	} else {
+		setErr := config.Client.Update(getPluginRatelimitKey(), string(data))
+
+		if setErr != nil {
+			logger.Warnf("update etcd error, %v\n", setErr)
+			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
+		}
+	}
+
+	return nil
+}
+
+// BizDeletePluginRatelimit delete plugin ratelimit config
+func BizDeletePluginRatelimit() error {
+	key := getPluginRatelimitKey()
+	err := config.Client.Delete(key)
+	if err != nil {
+		logger.Warnf("BizDeletePluginRatelimit, %v\n", err)
+		return perrors.WithMessage(err, "BizDeletePluginRatelimit error")
+	}
+	return nil
+}
+
 func getResourceKey(path string) string {
 	return getRootPath(Resources) + "/" + path
+}
+
+func getPluginRatelimitKey() string {
+	return getPluginPrefixKey() + "/" + Ratelimit
 }
 
 func getPluginGroupKey(name string) string {
@@ -341,6 +392,10 @@ func getPluginGroupKey(name string) string {
 
 func getPluginGroupPrefixKey() string {
 	return getRootPath(PluginGroup)
+}
+
+func getPluginPrefixKey() string {
+	return getRootPath(Plugin)
 }
 
 func getResourceMethodPrefixKey(path string) string {
