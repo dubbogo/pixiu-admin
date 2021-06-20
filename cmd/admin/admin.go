@@ -269,6 +269,7 @@ func DeleteResourceInfo(c *gin.Context) {
 		c.JSON(http.StatusOK, WithError(err))
 		return
 	}
+
 	c.JSON(http.StatusOK, WithRet("Success"))
 }
 

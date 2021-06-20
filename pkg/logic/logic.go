@@ -19,6 +19,7 @@ package logic
 
 import (
 	"errors"
+	"regexp"
 	"strconv"
 )
 
@@ -27,6 +28,7 @@ import (
 	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
 	gxetcd "github.com/dubbogo/gost/database/kv/etcd/v3"
 	perrors "github.com/pkg/errors"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 import (
@@ -41,6 +43,7 @@ const ResourceId = "ResourceId"
 const MethodId = "MethodId"
 const PluginGroup = "pluginGroup"
 const Plugin = "plugin"
+const Filter = "filter"
 const Ratelimit = "ratelimit"
 
 const ErrID = -1
@@ -85,14 +88,20 @@ func BizSetBaseInfo(info *config.BaseInfo, created bool) error {
 
 // BizGetResourceList get resource list
 func BizGetResourceList() ([]fc.Resource, error) {
-	_, vList, err := config.Client.GetChildrenKVList(getRootPath(Resources))
+	kList, vList, err := config.Client.GetChildrenKVList(getRootPath(Resources))
 	if err != nil {
 		logger.Errorf("BizGetResourceList err, %v\n", err)
 		return nil, perrors.WithMessage(err, "BizGetResourceList error")
 	}
-
 	var ret []fc.Resource
-	for _, v := range vList {
+
+	for i, k := range kList {
+		// only handle resource, filter method
+		re := getCheckResourceRegexp()
+		if m := re.Match([]byte(k)); !m {
+			continue
+		}
+		v := vList[i]
 		res := &fc.Resource{}
 		err := yaml.UnmarshalYML([]byte(v), res)
 		if err != nil {
@@ -153,6 +162,8 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 // BizDeleteResourceInfo delete resource
 func BizDeleteResourceInfo(id string) error {
 	key := getResourceKey(id)
+	// delete all key with prefix to delete method key
+	config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
 	err := config.Client.Delete(key)
 	if err != nil {
 		logger.Warnf("BizDeleteResourceInfo, %v\n", err)
@@ -383,7 +394,7 @@ func getResourceKey(path string) string {
 }
 
 func getPluginRatelimitKey() string {
-	return getPluginPrefixKey() + "/" + Ratelimit
+	return getFilterPrefixKey() + "/" + Ratelimit
 }
 
 func getPluginGroupKey(name string) string {
@@ -394,8 +405,8 @@ func getPluginGroupPrefixKey() string {
 	return getRootPath(PluginGroup)
 }
 
-func getPluginPrefixKey() string {
-	return getRootPath(Plugin)
+func getFilterPrefixKey() string {
+	return getRootPath(Filter)
 }
 
 func getResourceMethodPrefixKey(path string) string {
@@ -468,4 +479,8 @@ func loopGetId(k string) int {
 
 func getRootPath(key string) string {
 	return config.Bootstrap.GetPath() + "/" + key
+}
+
+func getCheckResourceRegexp() *regexp.Regexp {
+	return regexp.MustCompile(".+/Resources/[^/]+/?$")
 }
