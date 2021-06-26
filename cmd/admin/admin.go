@@ -240,6 +240,7 @@ func CreateResourceInfo(c *gin.Context) {
 
 // ModifyResourceInfo modify resource
 func ModifyResourceInfo(c *gin.Context) {
+	id := c.Query(ResourceId)
 	body := c.PostForm("content")
 
 	res := &fc.Resource{}
@@ -249,6 +250,15 @@ func ModifyResourceInfo(c *gin.Context) {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
 		return
+	}
+
+	if id != "" {
+		res.ID, err = strconv.Atoi(id)
+		if err != nil {
+			logger.Warnf("resource not number err, %v\n", err)
+			c.JSON(http.StatusOK, WithError(err))
+			return
+		}
 	}
 
 	setErr := logic.BizSetResourceInfo(res, false)
@@ -325,6 +335,15 @@ func CreateMethodInfo(c *gin.Context) {
 		return
 	}
 
+	resource, err := getResourceDetail(resourceId)
+
+	if err != nil {
+		logger.Warnf("CreateMethodInfo can't query resource  err, %v\n", err)
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+	res.ResourcePath = resource.Path
+
 	setErr := logic.BizSetResourceMethod(resourceId, res, true)
 
 	if setErr != nil {
@@ -332,6 +351,22 @@ func CreateMethodInfo(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, WithRet("Success"))
+}
+
+func getResourceDetail(id string) (*fc.Resource, error) {
+	res, err := logic.BizGetResourceDetail(id)
+	if err != nil {
+		return nil, err
+	}
+
+	resource := &fc.Resource{}
+	err = yaml.UnmarshalYML([]byte(res), resource)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resource, nil
 }
 
 // ModifyMethodInfo modify method
@@ -347,6 +382,15 @@ func ModifyMethodInfo(c *gin.Context) {
 		c.JSON(http.StatusOK, WithError(err))
 		return
 	}
+
+	resource, err := getResourceDetail(resourceId)
+
+	if err != nil {
+		logger.Warnf("CreateMethodInfo can't query resource  err, %v\n", err)
+		c.JSON(http.StatusOK, WithError(err))
+		return
+	}
+	res.ResourcePath = resource.Path
 
 	setErr := logic.BizSetResourceMethod(resourceId, res, false)
 

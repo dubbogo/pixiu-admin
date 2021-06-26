@@ -145,6 +145,9 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
 		}
 
+		for _, m := range methods {
+			m.ResourcePath = res.Path
+		}
 		// 创建 methods
 		BizBatchCreateResourceMethod(strconv.Itoa(res.ID), methods)
 	} else {
