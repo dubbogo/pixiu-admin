@@ -255,7 +255,7 @@ func ModifyResourceInfo(c *gin.Context) {
 	if id != "" {
 		res.ID, err = strconv.Atoi(id)
 		if err != nil {
-			logger.Warnf("resource not number err, %v\n", err)
+			logger.Warnf("resourceID not number err, %v\n", err)
 			c.JSON(http.StatusOK, WithError(err))
 			return
 		}
@@ -373,6 +373,7 @@ func getResourceDetail(id string) (*fc.Resource, error) {
 func ModifyMethodInfo(c *gin.Context) {
 	body := c.PostForm("content")
 	resourceId := c.Query(ResourceId)
+	methodId := c.Query(MethodId)
 
 	res := &fc.Method{}
 	err := yaml.UnmarshalYML([]byte(body), res)
@@ -381,6 +382,15 @@ func ModifyMethodInfo(c *gin.Context) {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
 		return
+	}
+
+	if methodId != "" {
+		res.ID, err = strconv.Atoi(methodId)
+		if err != nil {
+			logger.Warnf("methodID not number err, %v\n", err)
+			c.JSON(http.StatusOK, WithError(err))
+			return
+		}
 	}
 
 	resource, err := getResourceDetail(resourceId)
