@@ -10,7 +10,7 @@
           <el-button type="primary" icon="el-icon-plus" size="mini"
                      @click="handleChange">修改</el-button>
         </div>
-        
+
         <div class="custom-tools__content">
           <el-form :model="form"
                  :inline="true"
@@ -38,17 +38,14 @@
                   header-row-class-name="custom-table-header"
                   @selection-change="handleSelectionChange"
                   style="width: 100%">
-          <el-table-column 
+          <el-table-column
                            prop="id"
                            label="ID">
           </el-table-column>
-          <el-table-column 
+          <el-table-column
                            class-name="custom-popper--overflow"
                            prop="httpVerb"
                            label="方法">
-            <template slot-scope="scope">
-                <span></span>
-            </template>
           </el-table-column>
           <el-table-column class-name="custom-popper--overflow"
                            label="timeout">
@@ -56,18 +53,40 @@
                 <span>{{scope.row.timeout}}</span>
             </template>
           </el-table-column>
-          <el-table-column 
+          <el-table-column
                            prop="resourcePath"
                            label="路径">
           </el-table-column>
-          <el-table-column
-                           prop="type"
-                           label="类型">
+
+          <el-table-column prop="requestType" label="inboundRequest.requestType">
+            <template slot-scope="scope">
+                <span>{{scope.row.inboundRequest.requestType}}</span>
+            </template>
           </el-table-column>
-          <el-table-column
-                           prop="description"
-                           label="描述">
+          <el-table-column prop="headers" label="inboundRequest.headers">
+            <template slot-scope="scope">
+                <span>{{scope.row.inboundRequest.headers}}</span>
+            </template>
           </el-table-column>
+          <el-table-column prop="queryStrings" label="inboundRequest.queryStrings">
+            <template slot-scope="scope">
+                <span>{{scope.row.inboundRequest.queryStrings}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="requestBody" label="inboundRequest.requestBody">
+            <template slot-scope="scope">
+                <span>{{scope.row.inboundRequest.requestBody}}</span>
+            </template>
+          </el-table-column>
+
+
+          <!-- <el-table-column
+                           prop="integrationRequest"
+                           label="integrationRequest">
+            <template slot-scope="scope">
+                <span>{{scope.row.integrationRequest}}</span>
+            </template>
+          </el-table-column> -->
           <el-table-column
                            label="操作">
             <template slot-scope="scope">
@@ -82,7 +101,7 @@
 
         <div class="custom-pagination"
              style="float:right">
-          
+
           <div style="display: flex;">
             <div>
               总共<span>{{ pagination.total }}</span>条记录<i class="custom-pagination__interval"></i>每页显示
@@ -262,7 +281,7 @@ export default {
               let data = JSON.parse(res.data)
               console.log(data)
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -284,7 +303,7 @@ export default {
             this.getMethodList()
             console.log(res)
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -301,7 +320,7 @@ export default {
              this.tableData = JSON.parse(res.data)
              console.log(this.tableData)
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -341,7 +360,7 @@ export default {
             })
             this.monacoEditored.dispose()
             this.getResourceDetail()
-          } 
+          }
         })
         .catch((err) => {
           console.log(err)
@@ -352,7 +371,7 @@ export default {
       let data = this.createMonacoEditor.getValue()
 
       formData.append('content', data);
-      
+
       this.$post('/config/api/resource/method?resourceId=' + this.$route.query.resourceId, formData)
         .then((res) => {
           if (res.code == 10001) {
@@ -360,7 +379,7 @@ export default {
             this.getMethodList()
             console.log(res)
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -371,9 +390,9 @@ export default {
       let formData = new FormData();
       let data = this.updateMonacoEditor.getValue()
       formData.append('content', data);
-      
+
       this.$put('/config/api/resource/method?resourceId=' + this.$route.query.resourceId +
-                  "&methodId=" + this.selectedMethodId, 
+                  "&methodId=" + this.selectedMethodId,
                   formData)
         .then((res) => {
           if (res.code == 10001) {
@@ -381,7 +400,7 @@ export default {
             this.getMethodList()
             console.log(res)
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -415,7 +434,7 @@ export default {
                 this.initUpdateMoacoEditor('yaml', data)
               ])
           } else {
-            
+
           }
         })
         .catch((err) => {

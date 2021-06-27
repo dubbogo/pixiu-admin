@@ -10,7 +10,7 @@
           <el-button type="primary" icon="el-icon-plus" size="mini"
                      @click="handleChange">修改</el-button>
         </div>
-        
+
         <div class="custom-tools__content">
           <el-form :model="form"
                  :inline="true"
@@ -37,20 +37,20 @@
                   header-row-class-name="custom-table-header"
                   @selection-change="handleSelectionChange"
                   style="width: 100%">
-          <el-table-column 
+          <el-table-column
                            prop="id"
                            label="ID">
-            
+
           </el-table-column>
-          <el-table-column 
+          <!-- <el-table-column
                            prop=""
                            label="映射服务">
-            
-          </el-table-column>
+
+          </el-table-column> -->
           <el-table-column prop="path"
                            label="路径">
           </el-table-column>
-          <el-table-column 
+          <el-table-column
                            prop="type"
                            label="类型">
           </el-table-column>
@@ -72,7 +72,7 @@
 
         <div class="custom-pagination"
              style="float:right">
-          
+
           <div style="display: flex;">
             <div>
               总共<span>{{ pagination.total }}</span>条记录<i class="custom-pagination__interval"></i>每页显示
@@ -223,7 +223,7 @@ export default {
              this.tableData = JSON.parse(res.data)
              this.pagination.total = this.tableData.length
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -231,7 +231,7 @@ export default {
         })
     },
      //获取基础信息
-    init() {  
+    init() {
       this.$get('/config/api/base')
         .then((res) => {
           if (res.code == 10001) {
@@ -265,7 +265,7 @@ export default {
             })
             this.monacoEditored.dispose()
             this.init()
-          } 
+          }
         })
         .catch((err) => {
           console.log(err)
@@ -275,7 +275,7 @@ export default {
       let formData = new FormData();
       let data = this.monacoEditor.getValue()
       formData.append('content', data);
-      
+
       this.$post('/config/api/resource', formData)
         .then((res) => {
           if (res.code == 10001) {
@@ -283,7 +283,7 @@ export default {
             this.getResourceList()
             console.log(res)
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -304,7 +304,7 @@ export default {
             this.getResourceList()
             console.log(res)
           } else {
-            
+
           }
         })
         .catch((err) => {
