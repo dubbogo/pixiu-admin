@@ -38,9 +38,10 @@ import (
 )
 
 const Base = "base"
-const Resources = "Resources"
-const ResourceId = "ResourceId"
-const MethodId = "MethodId"
+const Resources = "resources"
+const Method = "method"
+const ResourceId = "resourceId"
+const MethodId = "methodId"
 const PluginGroup = "pluginGroup"
 const Plugin = "plugin"
 const Filter = "filter"
@@ -69,14 +70,12 @@ func BizSetBaseInfo(info *config.BaseInfo, created bool) error {
 
 	if created {
 		setErr := config.Client.Put(getRootPath(Base), string(data))
-
 		if setErr != nil {
 			logger.Warnf("BizSetBaseInfo create error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetBaseInfo error")
 		}
 	} else {
 		setErr := config.Client.Update(getRootPath(Base), string(data))
-
 		if setErr != nil {
 			logger.Warnf("BizSetBaseInfo update error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetBaseInfo error")
@@ -153,7 +152,6 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 	} else {
 		data, _ := yaml.MarshalYML(res)
 		setErr := config.Client.Update(getResourceKey(strconv.Itoa(res.ID)), string(data))
-
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
@@ -319,14 +317,12 @@ func BizSetPluginGroupInfo(res *fc.PluginsGroup, created bool) error {
 	data, _ := yaml.MarshalYML(res)
 	if created {
 		setErr := config.Client.Create(getPluginGroupKey(res.GroupName), string(data))
-
 		if setErr != nil {
 			logger.Warnf("create etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
 		}
 	} else {
 		setErr := config.Client.Update(getPluginGroupKey(res.GroupName), string(data))
-
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
@@ -364,14 +360,12 @@ func BizSetPluginRatelimitInfo(res *ratelimit.Config, created bool) error {
 	data, _ := yaml.MarshalYML(res)
 	if created {
 		setErr := config.Client.Create(getPluginRatelimitKey(), string(data))
-
 		if setErr != nil {
 			logger.Warnf("create etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
 		}
 	} else {
 		setErr := config.Client.Update(getPluginRatelimitKey(), string(data))
-
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
@@ -413,7 +407,7 @@ func getFilterPrefixKey() string {
 }
 
 func getResourceMethodPrefixKey(path string) string {
-	return getResourceKey(path) + "/" + "Method"
+	return getResourceKey(path) + "/" + Method
 }
 
 func getMethodKey(path string, method string) string {
@@ -453,7 +447,6 @@ func loopGetId(k string) int {
 			rev = 0
 		}
 		id, err := strconv.Atoi(val)
-
 		if err != nil {
 			logger.Error("GetId Atoi error, %v\n", err)
 			return ErrID

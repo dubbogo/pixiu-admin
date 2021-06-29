@@ -178,7 +178,6 @@ func SetBaseInfo(c *gin.Context) {
 
 	baseInfo := &config.BaseInfo{}
 	err := yaml.UnmarshalYML([]byte(body), baseInfo)
-
 	if err != nil {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -186,7 +185,6 @@ func SetBaseInfo(c *gin.Context) {
 	}
 
 	setErr := logic.BizSetBaseInfo(baseInfo, true)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -222,7 +220,6 @@ func CreateResourceInfo(c *gin.Context) {
 
 	res := &fc.Resource{}
 	err := yaml.UnmarshalYML([]byte(body), res)
-
 	if err != nil {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -230,7 +227,6 @@ func CreateResourceInfo(c *gin.Context) {
 	}
 
 	setErr := logic.BizSetResourceInfo(res, true)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -245,7 +241,6 @@ func ModifyResourceInfo(c *gin.Context) {
 
 	res := &fc.Resource{}
 	err := yaml.UnmarshalYML([]byte(body), res)
-
 	if err != nil {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -262,7 +257,6 @@ func ModifyResourceInfo(c *gin.Context) {
 	}
 
 	setErr := logic.BizSetResourceInfo(res, false)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -274,7 +268,6 @@ func ModifyResourceInfo(c *gin.Context) {
 func DeleteResourceInfo(c *gin.Context) {
 	id := c.Query(ResourceId)
 	err := logic.BizDeleteResourceInfo(id)
-
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
 		return
@@ -336,7 +329,6 @@ func CreateMethodInfo(c *gin.Context) {
 	}
 
 	resource, err := getResourceDetail(resourceId)
-
 	if err != nil {
 		logger.Warnf("CreateMethodInfo can't query resource  err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -345,7 +337,6 @@ func CreateMethodInfo(c *gin.Context) {
 	res.ResourcePath = resource.Path
 
 	setErr := logic.BizSetResourceMethod(resourceId, res, true)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -361,7 +352,6 @@ func getResourceDetail(id string) (*fc.Resource, error) {
 
 	resource := &fc.Resource{}
 	err = yaml.UnmarshalYML([]byte(res), resource)
-
 	if err != nil {
 		return nil, err
 	}
@@ -377,7 +367,6 @@ func ModifyMethodInfo(c *gin.Context) {
 
 	res := &fc.Method{}
 	err := yaml.UnmarshalYML([]byte(body), res)
-
 	if err != nil {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -394,7 +383,6 @@ func ModifyMethodInfo(c *gin.Context) {
 	}
 
 	resource, err := getResourceDetail(resourceId)
-
 	if err != nil {
 		logger.Warnf("CreateMethodInfo can't query resource  err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -403,7 +391,6 @@ func ModifyMethodInfo(c *gin.Context) {
 	res.ResourcePath = resource.Path
 
 	setErr := logic.BizSetResourceMethod(resourceId, res, false)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -440,7 +427,6 @@ func CreatePluginGroup(c *gin.Context) {
 
 	res := &fc.PluginsGroup{}
 	err := yaml.UnmarshalYML([]byte(body), res)
-
 	if err != nil {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -448,7 +434,6 @@ func CreatePluginGroup(c *gin.Context) {
 	}
 
 	setErr := logic.BizSetPluginGroupInfo(res, true)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -462,7 +447,6 @@ func ModifyPluginGroup(c *gin.Context) {
 
 	res := &fc.PluginsGroup{}
 	err := yaml.UnmarshalYML([]byte(body), res)
-
 	if err != nil {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -470,7 +454,6 @@ func ModifyPluginGroup(c *gin.Context) {
 	}
 
 	setErr := logic.BizSetPluginGroupInfo(res, false)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -482,7 +465,6 @@ func ModifyPluginGroup(c *gin.Context) {
 func DeletePluginGroup(c *gin.Context) {
 	name := c.Query("name")
 	err := logic.BizDeletePluginGroupInfo(name)
-
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
 		return
@@ -506,7 +488,6 @@ func CreatePluginRatelimit(c *gin.Context) {
 
 	res := &ratelimit.Config{}
 	err := yaml.UnmarshalYML([]byte(body), res)
-
 	if err != nil {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -514,7 +495,6 @@ func CreatePluginRatelimit(c *gin.Context) {
 	}
 
 	setErr := logic.BizSetPluginRatelimitInfo(res, true)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -528,7 +508,6 @@ func ModifyPluginRatelimit(c *gin.Context) {
 
 	res := &ratelimit.Config{}
 	err := yaml.UnmarshalYML([]byte(body), res)
-
 	if err != nil {
 		logger.Warnf("read body err, %v\n", err)
 		c.JSON(http.StatusOK, WithError(err))
@@ -536,7 +515,6 @@ func ModifyPluginRatelimit(c *gin.Context) {
 	}
 
 	setErr := logic.BizSetPluginRatelimitInfo(res, false)
-
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
@@ -547,7 +525,6 @@ func ModifyPluginRatelimit(c *gin.Context) {
 // BizDeletePluginRatelimit delete plugin ratelimit config
 func DeletePluginRatelimit(c *gin.Context) {
 	err := logic.BizDeletePluginRatelimit()
-
 	if err != nil {
 		c.JSON(http.StatusOK, WithError(err))
 		return
