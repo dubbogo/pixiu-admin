@@ -1,0 +1,31 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 2536454 */
+  src: url('iconfont.woff2?t=1620550020205') format('woff2'),
+       url('iconfont.woff?t=1620550020205') format('woff'),
+       url('iconfont.ttf?t=1620550020205') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.pxtuichu:before {
+  content: "\e6bc";
+}
+
+.pxicon-:before {
+  content: "\e672";
+}
+
+.pxxiaoxi:before {
+  content: "\e691";
+}
+
+.pxbianzu15:before {
+  content: "\e615";
+}
+

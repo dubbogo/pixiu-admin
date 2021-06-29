@@ -19,6 +19,7 @@ package logic
 
 import (
 	"errors"
+	"regexp"
 	"strconv"
 )
 
@@ -27,6 +28,7 @@ import (
 	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
 	gxetcd "github.com/dubbogo/gost/database/kv/etcd/v3"
 	perrors "github.com/pkg/errors"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 import (
@@ -36,11 +38,13 @@ import (
 )
 
 const Base = "base"
-const Resources = "Resources"
-const ResourceId = "ResourceId"
-const MethodId = "MethodId"
+const Resources = "resources"
+const Method = "method"
+const ResourceId = "resourceId"
+const MethodId = "methodId"
 const PluginGroup = "pluginGroup"
 const Plugin = "plugin"
+const Filter = "filter"
 const Ratelimit = "ratelimit"
 
 const ErrID = -1
@@ -66,14 +70,12 @@ func BizSetBaseInfo(info *config.BaseInfo, created bool) error {
 
 	if created {
 		setErr := config.Client.Put(getRootPath(Base), string(data))
-
 		if setErr != nil {
 			logger.Warnf("BizSetBaseInfo create error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetBaseInfo error")
 		}
 	} else {
 		setErr := config.Client.Update(getRootPath(Base), string(data))
-
 		if setErr != nil {
 			logger.Warnf("BizSetBaseInfo update error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetBaseInfo error")
@@ -85,14 +87,20 @@ func BizSetBaseInfo(info *config.BaseInfo, created bool) error {
 
 // BizGetResourceList get resource list
 func BizGetResourceList() ([]fc.Resource, error) {
-	_, vList, err := config.Client.GetChildrenKVList(getRootPath(Resources))
+	kList, vList, err := config.Client.GetChildrenKVList(getRootPath(Resources))
 	if err != nil {
 		logger.Errorf("BizGetResourceList err, %v\n", err)
 		return nil, perrors.WithMessage(err, "BizGetResourceList error")
 	}
-
 	var ret []fc.Resource
-	for _, v := range vList {
+
+	for i, k := range kList {
+		// only handle resource, filter method
+		re := getCheckResourceRegexp()
+		if m := re.Match([]byte(k)); !m {
+			continue
+		}
+		v := vList[i]
 		res := &fc.Resource{}
 		err := yaml.UnmarshalYML([]byte(v), res)
 		if err != nil {
@@ -136,12 +144,14 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
 		}
 
+		for _, m := range methods {
+			m.ResourcePath = res.Path
+		}
 		// 创建 methods
 		BizBatchCreateResourceMethod(strconv.Itoa(res.ID), methods)
 	} else {
 		data, _ := yaml.MarshalYML(res)
 		setErr := config.Client.Update(getResourceKey(strconv.Itoa(res.ID)), string(data))
-
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
@@ -153,6 +163,8 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 // BizDeleteResourceInfo delete resource
 func BizDeleteResourceInfo(id string) error {
 	key := getResourceKey(id)
+	// delete all key with prefix to delete method key
+	config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
 	err := config.Client.Delete(key)
 	if err != nil {
 		logger.Warnf("BizDeleteResourceInfo, %v\n", err)
@@ -305,14 +317,12 @@ func BizSetPluginGroupInfo(res *fc.PluginsGroup, created bool) error {
 	data, _ := yaml.MarshalYML(res)
 	if created {
 		setErr := config.Client.Create(getPluginGroupKey(res.GroupName), string(data))
-
 		if setErr != nil {
 			logger.Warnf("create etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
 		}
 	} else {
 		setErr := config.Client.Update(getPluginGroupKey(res.GroupName), string(data))
-
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
@@ -350,14 +360,12 @@ func BizSetPluginRatelimitInfo(res *ratelimit.Config, created bool) error {
 	data, _ := yaml.MarshalYML(res)
 	if created {
 		setErr := config.Client.Create(getPluginRatelimitKey(), string(data))
-
 		if setErr != nil {
 			logger.Warnf("create etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
 		}
 	} else {
 		setErr := config.Client.Update(getPluginRatelimitKey(), string(data))
-
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
@@ -383,7 +391,7 @@ func getResourceKey(path string) string {
 }
 
 func getPluginRatelimitKey() string {
-	return getPluginPrefixKey() + "/" + Ratelimit
+	return getFilterPrefixKey() + "/" + Ratelimit
 }
 
 func getPluginGroupKey(name string) string {
@@ -394,12 +402,12 @@ func getPluginGroupPrefixKey() string {
 	return getRootPath(PluginGroup)
 }
 
-func getPluginPrefixKey() string {
-	return getRootPath(Plugin)
+func getFilterPrefixKey() string {
+	return getRootPath(Filter)
 }
 
 func getResourceMethodPrefixKey(path string) string {
-	return getResourceKey(path) + "/" + "Method"
+	return getResourceKey(path) + "/" + Method
 }
 
 func getMethodKey(path string, method string) string {
@@ -439,7 +447,6 @@ func loopGetId(k string) int {
 			rev = 0
 		}
 		id, err := strconv.Atoi(val)
-
 		if err != nil {
 			logger.Error("GetId Atoi error, %v\n", err)
 			return ErrID
@@ -468,4 +475,8 @@ func loopGetId(k string) int {
 
 func getRootPath(key string) string {
 	return config.Bootstrap.GetPath() + "/" + key
+}
+
+func getCheckResourceRegexp() *regexp.Regexp {
+	return regexp.MustCompile(".+/Resources/[^/]+/?$")
 }
