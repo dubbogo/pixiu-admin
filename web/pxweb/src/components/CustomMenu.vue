@@ -152,27 +152,6 @@ export default {
       }
       return;
       // var type = current.openType
-      this.$get('/menu/getMenuList').then(res => {
-        if (res.code === 200 && res.data && res.data.length > 0) {
-          this.menuList = res.data
-          let findShow = this.menuList.find(item => item.children.length>0)
-          if(findShow){
-            this.initDefaultActive()
-          }else{
-            this.$router.push({
-              path:'/403'
-            })
-          }
-          
-        } else {
-          this.$router.push({
-            path:'/403'
-          })
-          // this.$message.error(res.msg)
-        }
-      }).catch(err => {
-        console.log(err)
-      })
     },
     // 设置激活的菜单项
     initDefaultActive () {

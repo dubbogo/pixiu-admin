@@ -55,9 +55,9 @@ module.exports = {
         // ...
         ...ThreeExamples
     },
-    pages: {
-        login: new PageReset('login', 'pixiu控制台管理系统'),
-    }
+    // pages: {
+    //     login: new PageReset('login', 'pixiu控制台管理系统'),
+    // }
 }
 /**
  * 页面构造器

@@ -223,7 +223,8 @@ export default {
              this.tableData = JSON.parse(res.data)
              this.pagination.total = this.tableData.length
           } else {
-
+             this.tableData = []
+             this.pagination.total = this.tableData.length
           }
         })
         .catch((err) => {

@@ -6,13 +6,13 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-    { path: '/login',
-      name: 'login',
-      component:() => import('@/views/Login.vue'),
-      children: [
-        
-      ],
-    },
+    // { path: '/login',
+    //   name: 'login',
+    //   component:() => import('@/views/Login.vue'),
+    //   children: [
+    //
+    //   ],
+    // },
     {
       path: '/',
       name: 'DashBoard',
