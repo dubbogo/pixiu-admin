@@ -1,9 +1,6 @@
 <template>
     <CustomLayout >
     <div class="custom-body">
-      <div>
-        <CommonTitle title="概览"></CommonTitle>
-      </div>
       <!-- <div class="custom-tools">
         <div class="table-head">
           <div class="custom-tools__info">基础信息</div>

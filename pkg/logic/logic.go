@@ -144,14 +144,17 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
 		}
 
-		for _, m := range methods {
-			m.ResourcePath = res.Path
+		for i, _ := range methods {
+			methods[i].ResourcePath = res.Path
 		}
 		// 创建 methods
 		BizBatchCreateResourceMethod(strconv.Itoa(res.ID), methods)
 	} else {
+		key := getResourceKey(strconv.Itoa(res.ID))
 		data, _ := yaml.MarshalYML(res)
-		setErr := config.Client.Update(getResourceKey(strconv.Itoa(res.ID)), string(data))
+		// should set method in this situation
+		res.Methods = nil
+		setErr := config.Client.Update(key, string(data))
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
@@ -478,5 +481,5 @@ func getRootPath(key string) string {
 }
 
 func getCheckResourceRegexp() *regexp.Regexp {
-	return regexp.MustCompile(".+/Resources/[^/]+/?$")
+	return regexp.MustCompile(".+/resources/[^/]+/?$")
 }

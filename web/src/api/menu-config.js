@@ -2,7 +2,7 @@ export const menuList = [{
   name: '网关配置',
   id: 'Gateway',
   children: [{
-    name: '概览',
+    name: '映射配置',
     id: 'Overview',
     componentName: '/Overview'
   }, 

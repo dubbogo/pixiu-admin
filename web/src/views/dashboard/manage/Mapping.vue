@@ -2,14 +2,15 @@
     <CustomLayout >
     <div class="custom-body">
       <div>
-        <CommonTitle title="插件配置"></CommonTitle>
+        <CommonTitle title="映射服务"></CommonTitle>
       </div>
-      <!-- <div class="custom-tools">
+      <div class="custom-tools">
         <div class="table-head">
-            <div class="custom-tools__info">基础信息</div>
-            <el-button type="primary" icon="el-icon-plus" size="mini"
-                        @click="handleAdd">修改</el-button>
+          <div class="custom-tools__info">Resource信息</div>
+          <el-button type="primary" icon="el-icon-plus" size="mini"
+                     @click="handleChange">修改</el-button>
         </div>
+
         <div class="custom-tools__content">
           <el-form :model="form"
                  :inline="true"
@@ -17,18 +18,14 @@
                  class="table-form bg-gray"
                  label-width="130px">
           <el-row>
-             <el-form-item label="pluginPath：">
-              <el-input v-model="form.title"
-                        clearable
-                        placeholder="请输入"></el-input>
-            </el-form-item>
-              
+            <div style="clear: 'both'; height: 300px;width: 100%;" id="containForm" ref="containForm"/>
           </el-row>
         </el-form>
         </div>
-      </div> -->
+      </div>
+
       <div class="table-head">
-        <div class="custom-tools__info">插件组</div>
+        <div class="custom-tools__info">方法映射</div>
         <el-button type="primary" icon="el-icon-plus" size="mini"
                      @click="handleAdd">新增</el-button>
       </div>
@@ -41,23 +38,55 @@
                   header-row-class-name="custom-table-header"
                   @selection-change="handleSelectionChange"
                   style="width: 100%">
-          <el-table-column 
+          <el-table-column
+                           prop="id"
+                           label="ID">
+          </el-table-column>
+          <el-table-column
                            class-name="custom-popper--overflow"
-                           prop="groupName"
-                           label="名称">
+                           prop="httpVerb"
+                           label="方法">
           </el-table-column>
           <el-table-column class-name="custom-popper--overflow"
-                           label="插件">
+                           label="timeout">
             <template slot-scope="scope">
-                <el-table :data="scope.row.plugins" stripe style="width: 100%">
-                  <el-table-column type="index"></el-table-column>
-                  <el-table-column prop="name" label="name"></el-table-column>
-                  <el-table-column prop="version" label="version"></el-table-column>
-                  <el-table-column prop="priority" label="priority"></el-table-column>
-                  <el-table-column prop="externalLookupName" label="externalLookupName"></el-table-column>
-                </el-table>
-              </template>
+                <span>{{scope.row.timeout}}</span>
+            </template>
           </el-table-column>
+          <el-table-column
+                           prop="resourcePath"
+                           label="路径">
+          </el-table-column>
+
+          <el-table-column prop="requestType" label="inboundRequest.requestType">
+            <template slot-scope="scope">
+                <span>{{scope.row.inboundRequest.requestType}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="headers" label="inboundRequest.headers">
+            <template slot-scope="scope">
+                <span>{{scope.row.inboundRequest.headers}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="queryStrings" label="inboundRequest.queryStrings">
+            <template slot-scope="scope">
+                <span>{{scope.row.inboundRequest.queryStrings}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="requestBody" label="inboundRequest.requestBody">
+            <template slot-scope="scope">
+                <span>{{scope.row.inboundRequest.requestBody}}</span>
+            </template>
+          </el-table-column>
+
+
+          <!-- <el-table-column
+                           prop="integrationRequest"
+                           label="integrationRequest">
+            <template slot-scope="scope">
+                <span>{{scope.row.integrationRequest}}</span>
+            </template>
+          </el-table-column> -->
           <el-table-column
                            label="操作">
             <template slot-scope="scope">
@@ -72,7 +101,7 @@
 
         <div class="custom-pagination"
              style="float:right">
-          
+
           <div style="display: flex;">
             <div>
               总共<span>{{ pagination.total }}</span>条记录<i class="custom-pagination__interval"></i>每页显示
@@ -96,8 +125,8 @@
         </div>
       </div>
     </div>
-    <el-dialog
-                title="新增"
+            <el-dialog
+                title="新增方法映射"
                 :visible.sync="createDialogVisible"
                 width="640px"
                 :before-close="handleClose">
@@ -111,7 +140,7 @@
         </el-dialog>
 
             <el-dialog
-                title="查看修改"
+                title="编辑方法映射"
                 :visible.sync="updateDialogVisible"
                 width="640px"
                 :before-close="handleClose">
@@ -141,13 +170,12 @@ export default {
   },
   data () {
     return {
+      edit:false,
+      createDialogVisible:false,
+      updateDialogVisible:false,
       form:{
 
       },
-      edit:false,      
-      createDialogVisible:false,
-      updateDialogVisible:false,
-      dialogVisible:false,
       chooseRow:{
         timeout:'',
         description:'',
@@ -174,12 +202,33 @@ export default {
       createDetailSource:null,
       createMonacoEditor: null,
       updateMonacoEditor: null,
+      monacoEditored: null,
+      selectedMethodId: null,
     }
   },
   mounted(){
-    this.getPluginList()
+    this.getMethodList()
+    this.getResourceDetail()
   },
   methods: {
+    initMoacoEditored(language, value) {
+      this.monacoEditored = monaco.editor.create(document.getElementById('containForm'), {
+        value,
+        language: 'yaml',
+        codeLens: true,
+        selectOnLineNumbers: true,
+        roundedSelection: false,
+        readOnly: false,
+        lineNumbersMinChars: true,
+        theme: 'vs-dark',
+        wordWrapColumn: 120,
+        folding: false,
+        showFoldingControls: 'always',
+        wordWrap: 'wordWrapColumn',
+        cursorStyle: 'line',
+        automaticLayout: true,
+      });
+    },
     initCreateMoacoEditor(language, value) {
       this.createMonacoEditor = monaco.editor.create(document.getElementById('createContainer'), {
         value,
@@ -216,19 +265,122 @@ export default {
         automaticLayout: true,
       });
     },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    handleAdd() {
+      this.areaDialogVisible = true
+    },
+    getMethodDeatil() {
+      this.$get('/config/api/resource/method/detail', {
+        resourceId: 1,
+        methodId: 2
+      })
+        .then((res) => {
+          if (res.code == 10001) {
+              let data = JSON.parse(res.data)
+              console.log(data)
+          } else {
+
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    //删除
+    deleteRow(row) {
+      this.$delete('/config/api/resource/method', {
+        resourceId: this.$route.query.resourceId,
+        methodId: row.id
+      })
+        .then((res) => {
+          if (res.code == 10001) {
+            this.$message({
+              type: 'success',
+              message: '删除成功！',
+            })
+            this.getMethodList()
+            console.log(res)
+          } else {
+
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+     //映射服务列表
+    getMethodList() {
+      this.$get('/config/api/resource/method/list', {
+        resourceId: this.$route.query.resourceId
+      })
+        .then((res) => {
+          if (res.code == 10001) {
+             this.tableData = JSON.parse(res.data)
+             console.log(this.tableData)
+          } else {
+
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    getResourceDetail() {
+      this.$get('/config/api/resource/detail', {
+        resourceId: this.$route.query.resourceId
+      })
+        .then((res) => {
+          if (res.code == 10001) {
+            this.$nextTick(() =>[
+              this.initMoacoEditored('yaml', res.data)
+            ])
+          } else {
+            this.$nextTick(() =>[
+              this.initMoacoEditored('yaml', '')
+            ])
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    //修改resource detail 信息
+    handleChange() {
+      let formData = new FormData();
+      let data = this.monacoEditored.getValue()
+      formData.append('content', data);
+      this.$put('/config/api/resource?resourceId=' + this.$route.query.resourceId, formData)
+        .then((res) => {
+          if (res.code == 10001) {
+            this.$message({
+              type: 'success',
+              message: '修改成功！',
+            })
+            this.monacoEditored.dispose()
+            this.getResourceDetail()
+            this.getMethodList()
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
     makeCreate() {
       let formData = new FormData();
       let data = this.createMonacoEditor.getValue()
+
       formData.append('content', data);
-      
-      this.$post('/config/api/plugin_group', formData)
+
+      this.$post('/config/api/resource/method?resourceId=' + this.$route.query.resourceId, formData)
         .then((res) => {
           if (res.code == 10001) {
             this.handleClose()
-            this.getPluginList()
+            this.getMethodList()
             console.log(res)
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -239,15 +391,17 @@ export default {
       let formData = new FormData();
       let data = this.updateMonacoEditor.getValue()
       formData.append('content', data);
-      
-      this.$put('/config/api/plugin_group', formData)
+
+      this.$put('/config/api/resource/method?resourceId=' + this.$route.query.resourceId +
+                  "&methodId=" + this.selectedMethodId,
+                  formData)
         .then((res) => {
           if (res.code == 10001) {
             this.handleClose()
-            this.getPluginList()
+            this.getMethodList()
             console.log(res)
           } else {
-            
+
           }
         })
         .catch((err) => {
@@ -264,23 +418,31 @@ export default {
         this.updateMonacoEditor.dispose();
       }
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val
-    },
-    getResourceDetail() {
-      this.$get('/config/api/plugin_group/detail')
+    handleLook(row) {
+
+      this.edit = true
+      this.$get('/config/api/resource/method/detail', {
+        resourceId: this.$route.query.resourceId,
+        methodId: row.id,
+      })
         .then((res) => {
           if (res.code == 10001) {
-              let data = JSON.parse(res.data)
-              console.log(data)
+              let data = res.data
+              this.modifyDetailSource = data
+              this.updateDialogVisible = true
+              this.selectedMethodId = row.id
+              this.$nextTick(() =>[
+                this.initUpdateMoacoEditor('yaml', data)
+              ])
           } else {
-            
+
           }
         })
         .catch((err) => {
           console.log(err)
         })
     },
+    //新增
     handleAdd() {
       this.createDialogVisible = true
       this.edit = false
@@ -288,91 +450,7 @@ export default {
         this.initCreateMoacoEditor('yaml', '')
       ])
     },
-    //映射服务列表
-    getPluginList() {
-      this.$get('/config/api/plugin_group/list', {
-      })
-        .then((res) => {
-          if (res.code == 10001) {
-             this.tableData = JSON.parse(res.data)
-          } else {
-             this.tableData = []
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
-    makeSure() {
-      let formData = new FormData();
-      formData.append('groupName', this.chooseRow.groupName);
-      let obj = [{  
-        name: "rate limit",
-        version: "0.0.1",
-        priority: 1000,
-        externalLookupName: "ExternalPluginRateLimit"
-      }]
-      formData.append('plugins', JSON.stringify(obj));
-      let mobj = []
-      formData.append('methods', null);
-      this.$post('/config/api/plugin_group', formData)
-        .then((res) => {
-          if (res.code == 10001) {
-            this.dialogVisible = false
-            this.getPluginList()
-            console.log(res)
-          } else {
-            
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
-    //删除
-    deleteRow(row) {
-      this.$delete('/config/api/plugin_group', {
-        name: row.groupName
-      })
-        .then((res) => {
-          if (res.code == 10001) {
-            this.$message({
-              type: 'success',
-              message: '删除成功！',
-            })
-            this.getPluginList()
-            console.log(res)
-          } else {
-            
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
-    handleLook(row) {
-      this.edit = true
-      this.$get('/config/api/plugin_group/detail', {
-        name: row.groupName,
-      })
-        .then((res) => {
-          if (res.code == 10001) {
-              let data = res.data
-              this.modifyDetailSource = data
-              this.updateDialogVisible = true
-              this.$nextTick(() =>[
-                this.initUpdateMoacoEditor('yaml', data)
-              ])
-          } else {
-            
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
-  },
-
+  }
 }
 </script>
 

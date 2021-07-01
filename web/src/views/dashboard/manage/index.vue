@@ -3,11 +3,11 @@
   <div class="manage">
     <div class="manage-head">
         <div class="manage-head__name">Dubbo Go Pixiu</div>
-        <div class="manage-head__info">
-            <i class="iconfont pxbianzu15 spe">admin</i>
-            <i class="iconfont pxxiaoxi spe"></i>
-            <i class="iconfont pxtuichu spe"></i>
-        </div>
+<!--        <div class="manage-head__info">-->
+<!--            <i class="iconfont pxbianzu15 spe">admin</i>-->
+<!--            <i class="iconfont pxxiaoxi spe"></i>-->
+<!--            <i class="iconfont pxtuichu spe"></i>-->
+<!--        </div>-->
     </div>
     <div class="manage-foot">
         <div class="menu-container" :class="{'menu-container--hide': !fromType}">
