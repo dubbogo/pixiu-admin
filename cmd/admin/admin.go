@@ -256,12 +256,37 @@ func ModifyResourceInfo(c *gin.Context) {
 		}
 	}
 
+	old, err := getResourceDetail(id)
+	if err == nil && old != nil {
+		// when resource path change, should modify all method below it
+		if old.Path != res.Path {
+			afterResourcePathChange(id, res.Path)
+		}
+	}
+
 	setErr := logic.BizSetResourceInfo(res, false)
 	if setErr != nil {
 		c.JSON(http.StatusOK, WithError(setErr))
 		return
 	}
+
 	c.JSON(http.StatusOK, WithRet("Success"))
+}
+
+func afterResourcePathChange(resourceId, path string) {
+	mList, err := logic.BizGetMethodList(resourceId)
+	if err != nil {
+		return
+	}
+	for i, _ := range mList {
+		m := &mList[i]
+		m.ResourcePath = path
+		setErr := logic.BizSetResourceMethod(resourceId, m, false)
+		if setErr != nil {
+			logger.Warnf("afterResourcePathChange err, %v\n", err)
+			continue
+		}
+	}
 }
 
 // DeleteResourceInfo delete resource
