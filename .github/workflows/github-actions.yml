@@ -95,10 +95,6 @@ jobs:
           chmod u+x before_ut.sh && ./before_ut.sh
           go mod vendor && go test ./pkg/... -coverprofile=coverage.txt -covermode=atomic
       # integration test
-      - name: Integration Test
-        run: |
-          chmod +x start_integrate_test.sh && chmod +x integrate_test.sh && ./start_integrate_test.sh
-
       - name: Coverage
         run: bash <(curl -s https://codecov.io/bash)
 
