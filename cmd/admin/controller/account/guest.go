@@ -1,16 +1,24 @@
 package account
 
 import (
+	"log"
+	"net/http"
+	"time"
+)
+
+import (
 	"github.com/dgrijalva/jwt-go"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/pkg/errors"
+)
+
+import (
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/auth"
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
 	"github.com/dubbogo/pixiu-admin/pkg/utils"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
-	"log"
-	"net/http"
-	"time"
 )
 
 func Register(c *gin.Context)  {

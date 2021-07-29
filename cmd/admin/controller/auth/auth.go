@@ -1,13 +1,21 @@
 package auth
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"log"
 	"net/http"
 	"time"
+)
+
+import (
+	"github.com/dgrijalva/jwt-go"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/pkg/errors"
+)
+
+import (
+	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 )
 
 // 检查token

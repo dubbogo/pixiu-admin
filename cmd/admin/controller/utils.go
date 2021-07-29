@@ -1,8 +1,8 @@
 package controller
 
-import "github.com/dubbogo/pixiu-admin/pkg/config"
-
-/* controller 常量与方法*/
+import (
+	"github.com/dubbogo/pixiu-admin/pkg/config"
+)
 
 // Version admin version
 const Version = "0.1.0"

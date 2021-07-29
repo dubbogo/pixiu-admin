@@ -1,13 +1,20 @@
 package account
 
 import (
+	"net/http"
+	"time"
+)
+
+import (
 	"github.com/dgrijalva/jwt-go"
+
+	"github.com/gin-gonic/gin"
+)
+
+import (
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/auth"
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
-	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 // Logout 用户注销

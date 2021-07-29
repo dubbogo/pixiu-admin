@@ -2,9 +2,11 @@ package database
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 )
 
+import (
+	_ "github.com/go-sql-driver/mysql"
+)
 
 //MysqlDriver mysql驱动器
 const MysqlDriver = "mysql"
