@@ -128,8 +128,8 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
 	// Guest 逻辑
-	r.POST("/login",account.Login)
-	r.POST("/register",account.Register)
+	r.POST("/login", account.Login)
+	r.POST("/register", account.Register)
 
 	// 设置auth 逻辑
 	taR := r.Group("/", auth.JWTAuth())
@@ -142,7 +142,6 @@ func SetupRouter() *gin.Engine {
 		taR.POST("/user/getInfo", account.GetUserInfo)
 		taR.POST("/user/getUserRole", account.GetUserRole)
 		taR.POST("/user/checkIsAdmin", account.CheckUserIsAdmin)
-
 
 		taR.GET("/config/api/base", GetBaseInfo)
 		taR.POST("/config/api/base/", SetBaseInfo)
@@ -171,7 +170,6 @@ func SetupRouter() *gin.Engine {
 		taR.PUT("/config/api/plugin/ratelimit", ModifyPluginRatelimit)
 		taR.DELETE("/config/api/plugin/ratelimit", DeletePluginRatelimit)
 	}
-
 
 	//r.GET("/config/api/base", GetBaseInfo)
 	//r.POST("/config/api/base/", SetBaseInfo)
@@ -598,6 +596,3 @@ func DeletePluginRatelimit(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, controller.WithRet("Success"))
 }
-
-
-

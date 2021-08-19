@@ -30,7 +30,6 @@ const RETRY = "10003"
 const ResourceId = "resourceId"
 const MethodId = "methodId"
 
-
 // WithError transform err to RetData
 func WithError(err error) config.RetData {
 	return config.RetData{Code: ERR, Data: err.Error()}

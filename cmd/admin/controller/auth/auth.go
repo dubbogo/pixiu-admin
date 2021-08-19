@@ -84,11 +84,11 @@ type JWT struct {
 
 // 常量
 var (
-	TokenExpired error = errors.New("Token is expired")
-	TokenNotValidYet error = errors.New("Token is not valid yet")
-	TokenMalformed error = errors.New("This is not a token")
-	TokenInvalid error = errors.New("Couldn't handle this token")
-	SignKey string = "dubbo-go-pixiu" // TODO: 签名信息设置为动态获取
+	TokenExpired     error  = errors.New("Token is expired")
+	TokenNotValidYet error  = errors.New("Token is not valid yet")
+	TokenMalformed   error  = errors.New("This is not a token")
+	TokenInvalid     error  = errors.New("Couldn't handle this token")
+	SignKey          string = "dubbo-go-pixiu" // TODO: 签名信息设置为动态获取
 )
 
 // 自定义载荷
@@ -97,7 +97,6 @@ type CustomClaims struct {
 	// StandardClaims结构体实现了Claims接口(Valid()函数)
 	jwt.StandardClaims
 }
-
 
 // 新建jwt示例
 func NewJWT() *JWT {
@@ -113,28 +112,28 @@ func GetSignKey() string {
 
 // CreateToken 生成token(基于用户基本信息)
 // 采用HS256算法
-func (j *JWT)CreateToken(claims CustomClaims) (string, error) {
+func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
 	// 返回token的结构体指针
-	token :=jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.SigningKey)
 }
 
 // ParseToken 解析token
-func (j *JWT)ParseToken(tokenString string) (*CustomClaims, error) {
+func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 	// 输入:token字符串, 自定义的Claims结构体对象,自定义函数
 	// 解析token字符串为jwt的Token结构体指针
-	token, err :=jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
 		if ve, ok := err.(jwt.ValidationError); ok {
-			if ve.Errors & jwt.ValidationErrorMalformed != 0 {
+			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				return nil, TokenMalformed
-			}else if ve.Errors & jwt.ValidationErrorExpired != 0 {
+			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
 				return nil, TokenExpired
-			}else if ve.Errors & jwt.ValidationErrorNotValidYet != 0 {
+			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
 				return nil, TokenNotValidYet
-			}else {
+			} else {
 				return nil, TokenInvalid
 			}
 		}
@@ -147,10 +146,10 @@ func (j *JWT)ParseToken(tokenString string) (*CustomClaims, error) {
 }
 
 // 更新token
-func (j *JWT)RefreshToken(tokenString string) (string, error) {
+func (j *JWT) RefreshToken(tokenString string) (string, error) {
 	// 过期时间验证
 	jwt.TimeFunc = func() time.Time {
-		return time.Unix(0,0)
+		return time.Unix(0, 0)
 	}
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil

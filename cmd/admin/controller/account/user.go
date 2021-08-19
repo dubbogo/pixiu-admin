@@ -35,7 +35,7 @@ import (
 )
 
 // Logout 用户注销
-func Logout(c *gin.Context){
+func Logout(c *gin.Context) {
 	// 设置token无效
 	j := auth.NewJWT()
 	claims := auth.CustomClaims{
@@ -63,7 +63,6 @@ func Logout(c *gin.Context){
 	//})
 	c.JSON(http.StatusOK, controller.WithRet(token))
 }
-
 
 // EditPassword 修改账户密码
 func EditPassword(c *gin.Context) {
@@ -126,7 +125,7 @@ func GetUserInfo(c *gin.Context) {
 }
 
 // GetUserRole 获取用户角色
-func GetUserRole(c *gin.Context)  {
+func GetUserRole(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, result, err := account.GetUserRole(username)
 	if !flag {

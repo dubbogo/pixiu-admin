@@ -13,7 +13,7 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*/
+ */
 
 package account
 
@@ -38,7 +38,7 @@ import (
 	"github.com/dubbogo/pixiu-admin/pkg/utils"
 )
 
-func Register(c *gin.Context)  {
+func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
@@ -65,7 +65,7 @@ func Register(c *gin.Context)  {
 	err := account.Register(username, password)
 	if err != nil {
 		c.JSON(http.StatusOK, controller.WithError(err))
-	}else {
+	} else {
 		c.JSON(http.StatusOK, controller.WithRet("注册成功，请登录！"))
 	}
 }
@@ -73,11 +73,10 @@ func Register(c *gin.Context)  {
 // 登录结果
 type LoginResult struct {
 	Username string `json:"username"`
-	Token string `json:"token"`
+	Token    string `json:"token"`
 }
 
-
-func Login(c *gin.Context)  {
+func Login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
@@ -88,12 +87,12 @@ func Login(c *gin.Context)  {
 	flag, _ := account.Login(username, password)
 	if flag {
 		generateToken(c, username)
-	}else{
+	} else {
 		c.JSON(http.StatusOK, controller.WithError(errors.New("验证失败, 登录信息有误!")))
 	}
 }
 
-func generateToken(c *gin.Context, username string)  {
+func generateToken(c *gin.Context, username string) {
 	j := auth.NewJWT()
 	claims := auth.CustomClaims{
 		Username: username,
