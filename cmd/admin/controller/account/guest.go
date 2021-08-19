@@ -1,19 +1,19 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package account
 
@@ -64,18 +64,8 @@ func Register(c *gin.Context)  {
 	password = utils.Md5(password)
 	err := account.Register(username, password)
 	if err != nil {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": -1,
-		//	"msg":    "注册失败: " + err.Error(),
-		//	"data":    nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithError(err))
 	}else {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": 0,
-		//	"msg":    "success ",
-		//	"data":   nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithRet("注册成功，请登录！"))
 	}
 }
@@ -99,11 +89,6 @@ func Login(c *gin.Context)  {
 	if flag {
 		generateToken(c, username)
 	}else{
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": -1,
-		//	"msg":    "验证失败, 登录信息有误",
-		//	"data":   nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithError(errors.New("验证失败, 登录信息有误!")))
 	}
 }
@@ -111,8 +96,8 @@ func Login(c *gin.Context)  {
 func generateToken(c *gin.Context, username string)  {
 	j := auth.NewJWT()
 	claims := auth.CustomClaims{
-		username,
-		jwt.StandardClaims{
+		Username: username,
+		StandardClaims: jwt.StandardClaims{
 			NotBefore: int64(time.Now().Unix() - 1000), // 签名生效时间
 			ExpiresAt: int64(time.Now().Unix() + 3600), // 签名过期时间
 			Issuer:    "dubbo-go-pixiu",
@@ -121,11 +106,6 @@ func generateToken(c *gin.Context, username string)  {
 	token, err := j.CreateToken(claims)
 
 	if err != nil {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": -1,
-		//	"msg":    err.Error(),
-		//	"data":   nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithError(err))
 		return
 	}
@@ -136,11 +116,5 @@ func generateToken(c *gin.Context, username string)  {
 		Username: username,
 		Token:    token,
 	}
-	//c.JSON(http.StatusOK, gin.H{
-	//	"status": 0,
-	//	"msg":    "登录成功",
-	//	"data":   data,
-	//})
 	c.JSON(http.StatusOK, controller.WithRet(data))
-	return
 }

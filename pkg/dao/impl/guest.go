@@ -81,9 +81,9 @@ func (d *GuestDao) Register(username, password string) error {
 		return errors.New("Failed to create data!")
 	}
 	// TODO 设置事务， 动态设置用户角色
-	err = db.QueryRow("SELECT id FROM pixiu_user WHERE username = ?", username).Scan(&id)
-	stmt, err = db.Prepare("INSERT INTO pixiu_user_role(user_id, role_id) VALUE (?, ?)")
-	_, err = stmt.Exec(id, 1)
+	_ = db.QueryRow("SELECT id FROM pixiu_user WHERE username = ?", username).Scan(&id)
+	stmt, _ = db.Prepare("INSERT INTO pixiu_user_role(user_id, role_id) VALUE (?, ?)")
+	_, _ = stmt.Exec(id, 1)
 	return err
 }
 

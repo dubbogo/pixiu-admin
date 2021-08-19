@@ -123,7 +123,6 @@ func GetUserInfo(c *gin.Context) {
 	//	"data":   userInfo,
 	//})
 	c.JSON(http.StatusOK, controller.WithRet(userInfo))
-	return
 }
 
 // GetUserRole 获取用户角色

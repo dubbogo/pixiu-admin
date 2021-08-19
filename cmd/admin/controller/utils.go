@@ -33,10 +33,10 @@ const MethodId = "methodId"
 
 // WithError transform err to RetData
 func WithError(err error) config.RetData {
-	return config.RetData{ERR, err.Error()}
+	return config.RetData{Code: ERR, Data: err.Error()}
 }
 
 // WithRet transform data to RetData
 func WithRet(data interface{}) config.RetData {
-	return config.RetData{OK, data}
+	return config.RetData{Code: OK, Data: data}
 }
