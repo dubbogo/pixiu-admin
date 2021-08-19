@@ -27,7 +27,6 @@ type GuestDao interface {
 	Register(username, password string) error
 }
 
-
 // UserDao
 type UserDao interface {
 	// EditPassword 修改用户密码
@@ -37,5 +36,5 @@ type UserDao interface {
 	// GetUserRole 获取用户角色
 	GetUserRole(username string) (bool, interface{}, error)
 	// CheckUserIsAdmin 判断用户是否管理员
-	CheckUserIsAdmin(username string) (bool,error)
+	CheckUserIsAdmin(username string) (bool, error)
 }

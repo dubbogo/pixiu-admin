@@ -22,9 +22,9 @@ import (
 	"github.com/dubbogo/pixiu-admin/pkg/dao/impl"
 )
 
-var(
+var (
 	guestDao dao.GuestDao = impl.NewGuestDao()
-	userDao dao.UserDao = impl.NewUserDao()
+	userDao  dao.UserDao  = impl.NewUserDao()
 )
 
 func Login(username string, password string) (bool, int) {

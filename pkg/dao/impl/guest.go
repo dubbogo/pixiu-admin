@@ -41,14 +41,13 @@ func NewGuestDao() *GuestDao {
 	}
 }
 
-func (d *GuestDao)Create(db *SQL.DB) (interface{}, error){
+func (d *GuestDao) Create(db *SQL.DB) (interface{}, error) {
 	d.db = db
 	var i dao.GuestDao = d
 	return &i, nil
 }
 
-
-func (d *GuestDao) Login(username, password string) (bool, int){
+func (d *GuestDao) Login(username, password string) (bool, int) {
 	db := d.db
 	var id int
 	err := db.QueryRow("SELECT id FROM pixiu_user WHERE username = ? AND password = ?;", username, password).Scan(&id)
@@ -87,8 +86,6 @@ func (d *GuestDao) Register(username, password string) error {
 	return err
 }
 
-
 func (d *GuestDao) CheckLogin() {
 	panic("implement me")
 }
-

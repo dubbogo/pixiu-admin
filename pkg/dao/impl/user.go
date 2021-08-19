@@ -36,15 +36,13 @@ type UserDao struct {
 	db *sql.DB
 }
 
-
-
 func NewUserDao() *UserDao {
 	return &UserDao{
 		db: database.GetConnection(),
 	}
 }
 
-func (d *UserDao)Create(db *sql.DB) (interface{}, error) {
+func (d *UserDao) Create(db *sql.DB) (interface{}, error) {
 	d.db = db
 	var i dao.UserDao = d
 	return &i, nil
@@ -85,9 +83,9 @@ func (d *UserDao) GetUserInfo(username string) (bool, interface{}, error) {
 		return false, "", errors.New("This user does not exist!")
 	}
 	userInfo := map[string]interface{}{
-		"userId": userId,
+		"userId":   userId,
 		"username": username,
-		"role": role,
+		"role":     role,
 	}
 	return true, userInfo, err
 }
@@ -105,7 +103,7 @@ func (d *UserDao) GetUserRole(username string) (bool, interface{}, error) {
 		return false, "", err
 	}
 	result := map[string]interface{}{
-		"role": role,
+		"role":        role,
 		"description": description,
 	}
 	return true, result, err
