@@ -218,7 +218,7 @@ func GetResourceList(c *gin.Context) {
 
 // GetResourceDetail get resource detail with yml
 func GetResourceDetail(c *gin.Context) {
-	id := c.Query(controller.ResourceId)
+	id := c.Query(controller.ResourceID)
 	res, err := logic.BizGetResourceDetail(id)
 	if err != nil {
 		c.JSON(http.StatusOK, controller.WithError(err))
@@ -249,7 +249,7 @@ func CreateResourceInfo(c *gin.Context) {
 
 // ModifyResourceInfo modify resource
 func ModifyResourceInfo(c *gin.Context) {
-	id := c.Query(controller.ResourceId)
+	id := c.Query(controller.ResourceID)
 	body := c.PostForm("content")
 
 	res := &fc.Resource{}
@@ -304,7 +304,7 @@ func afterResourcePathChange(resourceId, path string) {
 
 // DeleteResourceInfo delete resource
 func DeleteResourceInfo(c *gin.Context) {
-	id := c.Query(controller.ResourceId)
+	id := c.Query(controller.ResourceID)
 	err := logic.BizDeleteResourceInfo(id)
 	if err != nil {
 		c.JSON(http.StatusOK, controller.WithError(err))
@@ -316,7 +316,7 @@ func DeleteResourceInfo(c *gin.Context) {
 
 // GetMethodList get all method list below one resource
 func GetMethodList(c *gin.Context) {
-	resourceId := c.Query(controller.ResourceId)
+	resourceId := c.Query(controller.ResourceID)
 
 	res, err := logic.BizGetMethodList(resourceId)
 	if err != nil {
@@ -329,8 +329,8 @@ func GetMethodList(c *gin.Context) {
 
 // GetMethodDetail get method detail with yml
 func GetMethodDetail(c *gin.Context) {
-	resourceId := c.Query(controller.ResourceId)
-	methodId := c.Query(controller.MethodId)
+	resourceId := c.Query(controller.ResourceID)
+	methodId := c.Query(controller.MethodID)
 	res, err := logic.BizGetMethodDetail(resourceId, methodId)
 	if err != nil {
 		c.JSON(http.StatusOK, controller.WithError(err))
@@ -341,8 +341,8 @@ func GetMethodDetail(c *gin.Context) {
 
 // DeleteResourceInfo delete method
 func DeleteMethodInfo(c *gin.Context) {
-	resourceId := c.Query(controller.ResourceId)
-	methodId := c.Query(controller.MethodId)
+	resourceId := c.Query(controller.ResourceID)
+	methodId := c.Query(controller.MethodID)
 	err := logic.BizDeleteMethodInfo(resourceId, methodId)
 
 	if err != nil {
@@ -355,7 +355,7 @@ func DeleteMethodInfo(c *gin.Context) {
 // CreateMethodInfo create method
 func CreateMethodInfo(c *gin.Context) {
 	body := c.PostForm("content")
-	resourceId := c.Query(controller.ResourceId)
+	resourceId := c.Query(controller.ResourceID)
 
 	res := &fc.Method{}
 	err := yaml.UnmarshalYML([]byte(body), res)
@@ -400,8 +400,8 @@ func getResourceDetail(id string) (*fc.Resource, error) {
 // ModifyMethodInfo modify method
 func ModifyMethodInfo(c *gin.Context) {
 	body := c.PostForm("content")
-	resourceId := c.Query(controller.ResourceId)
-	methodId := c.Query(controller.MethodId)
+	resourceId := c.Query(controller.ResourceID)
+	methodId := c.Query(controller.MethodID)
 
 	res := &fc.Method{}
 	err := yaml.UnmarshalYML([]byte(body), res)
