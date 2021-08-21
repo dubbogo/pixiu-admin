@@ -20,15 +20,15 @@ package controller
 import (
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 )
-const(
-	Version = "0.1.0" // Version admin version
-	OK = "10001"
-	ERR = "10002"
-	RETRY = "10003"
-	ResourceID = "resourceId"
-	MethodID = "methodId"
-)
 
+const (
+	Version    = "0.1.0" // Version admin version
+	OK         = "10001"
+	ERR        = "10002"
+	RETRY      = "10003"
+	ResourceID = "resourceId"
+	MethodID   = "methodId"
+)
 
 // WithError transform err to RetData
 func WithError(err error) config.RetData {
