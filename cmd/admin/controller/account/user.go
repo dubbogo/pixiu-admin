@@ -34,37 +34,27 @@ import (
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
 )
 
-// Logout 用户注销
+// Logout user logout
 func Logout(c *gin.Context) {
-	// 设置token无效
+	// Invalid setting token
 	j := auth.NewJWT()
 	claims := auth.CustomClaims{
 		StandardClaims: jwt.StandardClaims{
-			NotBefore: int64(time.Now().Unix()), // 签名生效时间
-			ExpiresAt: int64(time.Now().Unix()), // 签名过期时间
+			NotBefore: int64(time.Now().Unix()), // Signature effective time
+			ExpiresAt: int64(time.Now().Unix()), // Signature expiration time
 			Issuer:    "dubbo-go-pixiu",
 		},
 	}
 	token, err := j.CreateToken(claims)
 	if err != nil {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": -1,
-		//	"msg":    err.Error(),
-		//	"data":   nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithError(err))
 		return
 	}
-	// TODO 优化返回的json
-	//c.JSON(http.StatusOK, gin.H{
-	//	"status": -1,
-	//	"msg":    "logout",
-	//	"token":   token,
-	//})
+	// TODO Optimize the returned json
 	c.JSON(http.StatusOK, controller.WithRet(token))
 }
 
-// EditPassword 修改账户密码
+// EditPassword modify account password
 func EditPassword(c *gin.Context) {
 
 	oldPassword := c.PostForm("oldPassword")
@@ -90,78 +80,43 @@ func EditPassword(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, err := account.EditPassword(oldPassword, newPassword, username)
 	if !flag {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": -1,
-		//	"msg":    err.Error(),
-		//	"data":   nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithError(err))
 		return
 	}
-	c.JSON(http.StatusOK, controller.WithRet("修改密码成功！"))
-	// TODO 是否需要更新token？
+	c.JSON(http.StatusOK, controller.WithRet("Successfully modify the password!"))
+	// TODO Do I need to update the token?
 	//generateToken(c, username)
 }
 
-// GetUserInfo 获取用户信息
+// GetUserInfo get user information
 func GetUserInfo(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, userInfo, err := account.GetUserInfo(username)
 	if !flag {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": -1,
-		//	"msg":    err.Error(),
-		//	"data":   nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithError(err))
 		return
 	}
-	//c.JSON(http.StatusOK, gin.H{
-	//	"status": 0,
-	//	"msg":    "获取用户信息成功",
-	//	"data":   userInfo,
-	//})
 	c.JSON(http.StatusOK, controller.WithRet(userInfo))
 }
 
-// GetUserRole 获取用户角色
+// GetUserRole get user role
 func GetUserRole(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, result, err := account.GetUserRole(username)
 	if !flag {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": -1,
-		//	"msg":    err.Error(),
-		//	"data":   nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithError(err))
 		return
 	}
-	//c.JSON(http.StatusOK, gin.H{
-	//	"status": 0,
-	//	"msg":    "获取用户角色成功",
-	//	"data":   result,
-	//})
 	c.JSON(http.StatusOK, controller.WithRet(result))
 }
 
-// CheckUserIsAdmin 判断是否为管理员
+// CheckUserIsAdmin determine whether you are an administrator
 func CheckUserIsAdmin(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, err := account.CheckUserIsAdmin(username)
 	if !flag {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"status": -1,
-		//	"msg":    err.Error(),
-		//	"data":   nil,
-		//})
 		c.JSON(http.StatusOK, controller.WithError(err))
 		return
 	}
-	//c.JSON(http.StatusOK, gin.H{
-	//	"status": 0,
-	//	"msg":    "This user is admin",
-	//	"data":   nil,
-	//})
 	c.JSON(http.StatusOK, controller.WithRet("This user is admin"))
 }

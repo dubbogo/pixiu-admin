@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/*pixiu_admin 数据库表设计demo示例*/
+/*pixiu_admin Database table design demo example*/
 
 CREATE DATABASE  IF NOT EXISTS  `pixiu`  DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;
 

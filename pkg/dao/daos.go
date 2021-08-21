@@ -19,22 +19,22 @@ package dao
 
 // GuestDao
 type GuestDao interface {
-	// Login 登录
+	// Login login
 	Login(username, password string) (bool, int)
-	// CheckLogin 检查用户是否登录
+	// CheckLogin check login
 	CheckLogin()
-	// Register 用户注册
+	// Register register
 	Register(username, password string) error
 }
 
 // UserDao
 type UserDao interface {
-	// EditPassword 修改用户密码
+	// EditPassword edit password
 	EditPassword(oldPassword, newPassword, username string) (bool, error)
-	// GetUserInfo 获取用户信息
+	// GetUserInfo get user info
 	GetUserInfo(username string) (bool, interface{}, error)
-	// GetUserRole 获取用户角色
+	// GetUserRole get user role
 	GetUserRole(username string) (bool, interface{}, error)
-	// CheckUserIsAdmin 判断用户是否管理员
+	// CheckUserIsAdmin check user is admin
 	CheckUserIsAdmin(username string) (bool, error)
 }

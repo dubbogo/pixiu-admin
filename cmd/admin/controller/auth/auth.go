@@ -35,93 +35,78 @@ import (
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 )
 
-// 检查token
+// Check token
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("token")
 		if token == "" {
-			//c.JSON(http.StatusOK, gin.H{
-			//	"status": -1,
-			//	"msg":    "请求未携带token, 无权限访问",
-			//	"data":   nil,
-			//})
-			c.JSON(http.StatusOK, controller.WithError(errors.New("请求未携带token, 无权限访问")))
+			c.JSON(http.StatusOK, controller.WithError(errors.New("Request does not carry token, no access")))
 			c.Abort()
 			return
 		}
 		log.Print("get token: ", token)
 		j := NewJWT()
-		// 解析token中包含信息
+		// Parse the information contained in the token
 		claims, err := j.ParseToken(token)
 		if err != nil {
-			// token 授权过期情况
+			// token authorization expiration
 			if err == TokenExpired {
-				//c.JSON(http.StatusOK, gin.H{
-				//	"status": -1,
-				//	"msg": 	  "token授权已过期, 请重新申请授权",
-				//	"data":   nil,
-				//})
-				c.JSON(http.StatusOK, controller.WithError(errors.New("token授权已过期, 请重新申请授权")))
+				c.JSON(http.StatusOK, controller.WithError(errors.New("The token authorization has expired, please reapply for authorization")))
 				c.Abort()
 				return
 			}
-			// 其他token错误情况
-			//c.JSON(http.StatusOK, gin.H{
-			//	"status": -1,
-			//	"msg":    err.Error(),
-			//	"data":   nil,
-			//})
+			// Other token error conditions
 			c.JSON(http.StatusOK, controller.WithError(err))
 		}
 		c.Set("claims", claims)
 	}
 }
 
-// JWT 签名结构
+// JWT Signature structure
 type JWT struct {
 	SigningKey []byte
 }
 
-// 常量
+// Constant
 var (
 	TokenExpired     error  = errors.New("Token is expired")
 	TokenNotValidYet error  = errors.New("Token is not valid yet")
 	TokenMalformed   error  = errors.New("This is not a token")
 	TokenInvalid     error  = errors.New("Couldn't handle this token")
-	SignKey          string = "dubbo-go-pixiu" // TODO: 签名信息设置为动态获取
+	SignKey          string = "dubbo-go-pixiu" // TODO: The signature information is set to be dynamically obtained
 )
 
-// 自定义载荷
+// Custom Claims
 type CustomClaims struct {
 	Username string `json:"username"`
-	// StandardClaims结构体实现了Claims接口(Valid()函数)
+	// The StandardClaims structure implements the Claims interface (Valid() function)
 	jwt.StandardClaims
 }
 
-// 新建jwt示例
+// New jwt instance
 func NewJWT() *JWT {
 	return &JWT{
 		[]byte(GetSignKey()),
 	}
 }
 
-// 获取SignKey
+// get signKey
 func GetSignKey() string {
 	return SignKey
 }
 
-// CreateToken 生成token(基于用户基本信息)
-// 采用HS256算法
+// CreateToken Generate token (based on user basic information)
+// HS256 algorithm
 func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
-	// 返回token的结构体指针
+	// Returns the structure pointer of the token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.SigningKey)
 }
 
-// ParseToken 解析token
+// ParseToken
 func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
-	// 输入:token字符串, 自定义的Claims结构体对象,自定义函数
-	// 解析token字符串为jwt的Token结构体指针
+	// Input: token string, custom Claims structure object, custom function
+	// Parse the token string into jwt's Token structure pointer
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
@@ -138,16 +123,17 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 			}
 		}
 	}
-	// 将token中的claims信息解析出来和用户原始数据进行校验, 做以下类型断言，将token.Claims转换成具体用户自定义的Claims结构体
+	// Parse the claims information in the token and verify the original user data, make the following types of assertions
+	//, and convert token.Claims into a specific user-defined Claims structure
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		return claims, nil
 	}
 	return nil, TokenInvalid
 }
 
-// 更新token
+// Update token
 func (j *JWT) RefreshToken(tokenString string) (string, error) {
-	// 过期时间验证
+	// Expiration time verification
 	jwt.TimeFunc = func() time.Time {
 		return time.Unix(0, 0)
 	}
@@ -159,7 +145,7 @@ func (j *JWT) RefreshToken(tokenString string) (string, error) {
 	}
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		jwt.TimeFunc = time.Now
-		// 设置token过期时间
+		// Set token expiration time
 		claims.StandardClaims.ExpiresAt = time.Now().Add(1 * time.Hour).Unix()
 		return j.CreateToken(*claims)
 	}

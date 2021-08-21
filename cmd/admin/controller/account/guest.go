@@ -42,8 +42,7 @@ func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
-	// 格式检查， 前端实现？
-	// 4到16位（字母，数字，下划线，减号）
+	// username password Format check
 	//if flag, _ := regexp.MatchString("^[a-zA-Z0-9_-]{4,16}$", username); !flag {
 	//	c.JSON(http.StatusOK, gin.H{
 	//		"status": -1,
@@ -52,7 +51,7 @@ func Register(c *gin.Context) {
 	//	})
 	//	return
 	//}
-	// 密码至少包含 数字和英文，长度6-20
+
 	//if flag, _ := regexp.MatchString("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$", password); !flag {
 	//	c.JSON(http.StatusOK, gin.H{
 	//		"status": -1,
@@ -66,11 +65,11 @@ func Register(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, controller.WithError(err))
 	} else {
-		c.JSON(http.StatusOK, controller.WithRet("注册成功，请登录！"))
+		c.JSON(http.StatusOK, controller.WithRet("Register successfully, please login!"))
 	}
 }
 
-// 登录结果
+// login result
 type LoginResult struct {
 	Username string `json:"username"`
 	Token    string `json:"token"`
@@ -88,7 +87,7 @@ func Login(c *gin.Context) {
 	if flag {
 		generateToken(c, username)
 	} else {
-		c.JSON(http.StatusOK, controller.WithError(errors.New("验证失败, 登录信息有误!")))
+		c.JSON(http.StatusOK, controller.WithError(errors.New("Authentication failed, login information is wrong!")))
 	}
 }
 
@@ -97,8 +96,8 @@ func generateToken(c *gin.Context, username string) {
 	claims := auth.CustomClaims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
-			NotBefore: int64(time.Now().Unix() - 1000), // 签名生效时间
-			ExpiresAt: int64(time.Now().Unix() + 3600), // 签名过期时间
+			NotBefore: int64(time.Now().Unix() - 1000), // Signature effective time
+			ExpiresAt: int64(time.Now().Unix() + 3600), // Signature expiration time
 			Issuer:    "dubbo-go-pixiu",
 		},
 	}

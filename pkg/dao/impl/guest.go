@@ -67,7 +67,7 @@ func (d *GuestDao) Register(username, password string) error {
 	var id int
 	err := db.QueryRow("SELECT id FROM pixiu_user WHERE username = ?", username).Scan(&id)
 	if err == nil {
-		return errors.New("用户已存在, 请登录")
+		return errors.New("User already exists, please login")
 	}
 	//now := time.Now().Format("2006-01-02 15:04:05")
 	stmt, err := db.Prepare("INSERT INTO pixiu_user (username,password) VALUES (?,?)")
@@ -79,7 +79,7 @@ func (d *GuestDao) Register(username, password string) error {
 	if err != nil {
 		return errors.New("Failed to create data!")
 	}
-	// TODO 设置事务， 动态设置用户角色
+	// TODO Set transactions and dynamically set user roles
 	_ = db.QueryRow("SELECT id FROM pixiu_user WHERE username = ?", username).Scan(&id)
 	stmt, _ = db.Prepare("INSERT INTO pixiu_user_role(user_id, role_id) VALUE (?, ?)")
 	_, _ = stmt.Exec(id, 1)

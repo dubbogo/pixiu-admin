@@ -127,16 +127,16 @@ func Stop() {
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
-	// Guest 逻辑
+	// Guest router
 	r.POST("/login", account.Login)
 	r.POST("/register", account.Register)
 
-	// 设置auth 逻辑
+	// auth router
 	taR := r.Group("/", auth.JWTAuth())
 
-	// 下述router 需要检查 token
+	// The following router needs to check the token
 	{
-		// user 逻辑
+		// user router
 		taR.POST("/user/logout", account.Logout)
 		taR.POST("/user/password/edit", account.EditPassword)
 		taR.POST("/user/getInfo", account.GetUserInfo)
@@ -170,33 +170,6 @@ func SetupRouter() *gin.Engine {
 		taR.PUT("/config/api/plugin/ratelimit", ModifyPluginRatelimit)
 		taR.DELETE("/config/api/plugin/ratelimit", DeletePluginRatelimit)
 	}
-
-	//r.GET("/config/api/base", GetBaseInfo)
-	//r.POST("/config/api/base/", SetBaseInfo)
-	//r.PUT("/config/api/base/", SetBaseInfo)
-
-	//r.GET("/config/api/resource/list", GetResourceList)
-	//r.GET("/config/api/resource/detail", GetResourceDetail)
-	//r.POST("/config/api/resource", CreateResourceInfo)
-	//r.PUT("/config/api/resource", ModifyResourceInfo)
-	//r.DELETE("/config/api/resource", DeleteResourceInfo)
-	//
-	//r.GET("/config/api/resource/method/list", GetMethodList)
-	//r.GET("/config/api/resource/method/detail", GetMethodDetail)
-	//r.POST("/config/api/resource/method", CreateMethodInfo)
-	//r.PUT("/config/api/resource/method", ModifyMethodInfo)
-	//r.DELETE("/config/api/resource/method", DeleteMethodInfo)
-	//
-	//r.GET("/config/api/plugin_group/list", GetPluginGroupList)
-	//r.GET("/config/api/plugin_group/detail", GetPluginGroupDetail)
-	//r.POST("/config/api/plugin_group", CreatePluginGroup)
-	//r.PUT("/config/api/plugin_group", ModifyPluginGroup)
-	//r.DELETE("/config/api/plugin_group", DeletePluginGroup)
-	//
-	//r.GET("/config/api/plugin/ratelimit", GetPluginRatelimitDetail)
-	//r.POST("/config/api/plugin/ratelimit", CreatePluginRatelimit)
-	//r.PUT("/config/api/plugin/ratelimit", ModifyPluginRatelimit)
-	//r.DELETE("/config/api/plugin/ratelimit", DeletePluginRatelimit)
 
 	return r
 }
