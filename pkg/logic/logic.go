@@ -130,7 +130,7 @@ func BizGetResourceDetail(id string) (string, error) {
 func BizSetResourceInfo(res *fc.Resource, created bool) error {
 
 	if created {
-		// 备份 method
+		// backups method
 		methods := res.Methods
 		res.Methods = nil
 
@@ -150,7 +150,7 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 		for i, _ := range methods {
 			methods[i].ResourcePath = res.Path
 		}
-		// 创建 methods
+		// create methods
 		BizBatchCreateResourceMethod(strconv.Itoa(res.ID), methods)
 	} else {
 		key := getResourceKey(strconv.Itoa(res.ID))
