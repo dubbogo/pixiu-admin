@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
 	"time"
 )
@@ -30,6 +31,7 @@ import (
 	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/spf13/cobra"
 )
 
@@ -66,10 +68,13 @@ var (
 				logger.Errorf("load admin config  error:%+v", err)
 			}
 			Start()
+			sigint := make(chan os.Signal, 1)
+			signal.Notify(sigint, os.Interrupt)
+			<-sigint
+			Stop()
 		},
 	}
 )
-
 
 // Start start init etcd client and start admin http server
 func Start() {
@@ -107,12 +112,12 @@ func initDefaultValue() {
 }
 
 // main admin run method
-func main() {
-	app := getRootCmd()
-
-	// ignore error so we don't exit non-zero and break gfmrun README example tests
-	_ = app.Execute()
-}
+//func main() {
+//	app := getRootCmd()
+//
+//	// ignore error so we don't exit non-zero and break gfmrun README example tests
+//	_ = app.Execute()
+//}
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
