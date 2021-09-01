@@ -49,14 +49,13 @@ var (
 )
 
 var (
-	adminCmd = &cobra.Command{
-		Use:   "pixiu admin",
-		Short: "Run dubbo go pixiu admin",
-	}
-
-	StartAdminCmd = &cobra.Command{
-		Use:     "start",
-		Short:   "Start pixiu admin",
+	rootCmd = &cobra.Command{
+		Use:   "dubbogo pixiu admin",
+		Short: "Dubbogo pixiu admin is the control panel of pixiu gateway.",
+		Long: "dubbgo pixiu admin is used to manage the visual interface of dubbogo pixiu, supporting login, user management, \n" +
+			"plugin management, service configuration, API key management, interface authority management \n" +
+			"(appKey authorization, interface authority, online and offline). \n" +
+			"(c) " + strconv.Itoa(time.Now().Year()) + " Dubbogo",
 		Version: controller.Version,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			initDefaultValue()
@@ -69,16 +68,8 @@ var (
 			Start()
 		},
 	}
-
-	StopAdminCmd = &cobra.Command{
-		Use:     "Stop",
-		Short:   "Stop pixiu admin",
-		Version: controller.Version,
-		Run: func(cmd *cobra.Command, args []string) {
-			Stop()
-		},
-	}
 )
+
 
 // Start start init etcd client and start admin http server
 func Start() {
@@ -96,26 +87,12 @@ func Stop() {
 
 // init Init startCmd
 func init() {
-	StartAdminCmd.PersistentFlags().StringVarP(&configPath, "config", "c", os.Getenv("DUBBOGO_PIXIU_CONFIG"), "Load configuration from `FILE`")
-	StartAdminCmd.PersistentFlags().StringVarP(&apiConfigPath, "api-config", "a", os.Getenv("DUBBOGO_PIXIU_API_CONFIG"), "Load api configuration from `FILE`")
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", os.Getenv("DUBBOGO_PIXIU_CONFIG"), "Load configuration from `FILE`")
+	rootCmd.PersistentFlags().StringVarP(&apiConfigPath, "api-config", "a", os.Getenv("DUBBOGO_PIXIU_API_CONFIG"), "Load api configuration from `FILE`")
 
-	adminCmd.AddCommand(StartAdminCmd)
-	adminCmd.AddCommand(StopAdminCmd)
 }
 
 func getRootCmd() *cobra.Command {
-	rootCmd := &cobra.Command{
-		Use:   "dubbogo pixiu admin",
-		Short: "Dubbogo pixiu admin is the control panel of pixiu gateway.",
-		Long: "dubbgo pixiu admin is used to manage the visual interface of dubbogo pixiu, supporting login, user management, \n" +
-			"plugin management, service configuration, API key management, interface authority management \n" +
-			"(appKey authorization, interface authority, online and offline). \n" +
-			"(c) " + strconv.Itoa(time.Now().Year()) + " Dubbogo",
-		Version: controller.Version,
-	}
-
-	rootCmd.AddCommand(adminCmd)
-
 	return rootCmd
 }
 
