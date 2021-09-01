@@ -68,6 +68,7 @@ var (
 				logger.Errorf("load admin config  error:%+v", err)
 			}
 			Start()
+			// gracefully shutdown
 			sigint := make(chan os.Signal, 1)
 			signal.Notify(sigint, os.Interrupt)
 			<-sigint
@@ -112,12 +113,12 @@ func initDefaultValue() {
 }
 
 // main admin run method
-//func main() {
-//	app := getRootCmd()
-//
-//	// ignore error so we don't exit non-zero and break gfmrun README example tests
-//	_ = app.Execute()
-//}
+func main() {
+	app := getRootCmd()
+
+	// ignore error so we don't exit non-zero and break gfmrun README example tests
+	_ = app.Execute()
+}
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
