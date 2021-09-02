@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
 	"time"
 )
@@ -31,7 +32,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/urfave/cli"
+	"github.com/spf13/cobra"
 )
 
 import (
@@ -45,70 +46,36 @@ import (
 )
 
 var (
-	cmdStart = cli.Command{
-		Name:  "start",
-		Usage: "start dubbogo pixiu admin",
-		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:   "config, c",
-				Usage:  "Load configuration from `FILE`",
-				EnvVar: "PROXY_ADMIN_CONFIG",
-				Value:  "configs/admin_config.yaml",
-			},
+	configPath    string
+	apiConfigPath string
+)
+
+var (
+	rootCmd = &cobra.Command{
+		Use:   "dubbogo pixiu admin",
+		Short: "Dubbogo pixiu admin is the control panel of pixiu gateway.",
+		Long: "dubbgo pixiu admin is used to manage the visual interface of dubbogo pixiu, supporting login, user management, \n" +
+			"plugin management, service configuration, API key management, interface authority management \n" +
+			"(appKey authorization, interface authority, online and offline). \n" +
+			"(c) " + strconv.Itoa(time.Now().Year()) + " Dubbogo",
+		Version: controller.Version,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			initDefaultValue()
 		},
-		Action: func(c *cli.Context) error {
-			configPath := c.String("config")
+		Run: func(cmd *cobra.Command, args []string) {
 			_, err := config.LoadAPIConfigFromFile(configPath)
 			if err != nil {
 				logger.Errorf("load admin config  error:%+v", err)
-				return err
 			}
 			Start()
-			return nil
-		},
-	}
-
-	cmdStop = cli.Command{
-		Name:  "stop",
-		Usage: "stop dubbogo pixiu admin",
-		Action: func(c *cli.Context) error {
+			// gracefully shutdown
+			sigint := make(chan os.Signal, 1)
+			signal.Notify(sigint, os.Interrupt)
+			<-sigint
 			Stop()
-			return nil
 		},
 	}
 )
-
-func newAdminApp(startCmd *cli.Command) *cli.App {
-	app := cli.NewApp()
-	app.Name = "dubbogo pixiu admin"
-	app.Version = controller.Version
-	app.Compiled = time.Now()
-	app.Copyright = "(c) " + strconv.Itoa(time.Now().Year()) + " Dubbogo"
-	app.Usage = "Dubbogo pixiu admin"
-	app.Flags = cmdStart.Flags
-
-	// commands
-	app.Commands = []cli.Command{
-		cmdStart,
-		cmdStop,
-	}
-
-	// action
-	app.Action = func(c *cli.Context) error {
-		if c.NumFlags() == 0 {
-			return cli.ShowAppHelp(c)
-		}
-		return startCmd.Action.(func(c *cli.Context) error)(c)
-	}
-
-	return app
-}
-
-func main() {
-	app := newAdminApp(&cmdStart)
-	// ignore error so we don't exit non-zero and break gfmrun README example tests
-	_ = app.Run(os.Args)
-}
 
 // Start start init etcd client and start admin http server
 func Start() {
@@ -122,6 +89,35 @@ func Start() {
 
 func Stop() {
 	config.CloseEtcdClient()
+}
+
+// init Init startCmd
+func init() {
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", os.Getenv("DUBBOGO_PIXIU_CONFIG"), "Load configuration from `FILE`")
+	rootCmd.PersistentFlags().StringVarP(&apiConfigPath, "api-config", "a", os.Getenv("DUBBOGO_PIXIU_API_CONFIG"), "Load api configuration from `FILE`")
+
+}
+
+func getRootCmd() *cobra.Command {
+	return rootCmd
+}
+
+func initDefaultValue() {
+	if configPath == "" {
+		configPath = "configs/admin_config.yaml"
+	}
+
+	if apiConfigPath == "" {
+		apiConfigPath = "configs/api_config.yaml"
+	}
+}
+
+// main admin run method
+func main() {
+	app := getRootCmd()
+
+	// ignore error so we don't exit non-zero and break gfmrun README example tests
+	_ = app.Execute()
 }
 
 func SetupRouter() *gin.Engine {
