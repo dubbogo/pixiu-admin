@@ -28,7 +28,7 @@ func Test_method1(t *testing.T) {
 	list1 = append(list1, "a")
 	list2 = nil
 	for _, v1 := range list1 {
-		for _,v := range list2 {
+		for _, v := range list2 {
 			fmt.Println("in side" + v)
 			//t.Log("inside" + v)
 		}
@@ -43,4 +43,3 @@ func Test_regx_split(t *testing.T) {
 	split := re.Split(txt, -1)
 	fmt.Println(split)
 }
-

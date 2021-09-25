@@ -22,10 +22,10 @@ import (
 )
 
 const (
-	Version    = "0.1.0" // Version admin version
-	OK         = "10001"
-	ERR        = "10002"
-	RETRY      = "10003"
+	Version = "0.1.0" // Version admin version
+	OK      = "10001"
+	ERR     = "10002"
+	RETRY   = "10003"
 )
 
 // WithError transform err to RetData

@@ -106,7 +106,7 @@ func CreateResourceInfo(c *gin.Context) {
 	setErr1, setErr2 = nil, nil
 	if unpublished {
 		setErr2 = logic.BizSetResourceInfo(res, true, true)
-	}else{
+	} else {
 		setErr1 = logic.BizSetResourceInfo(res, true, false)
 		setErr2 = logic.BizSetResourceInfo(res, true, true)
 	}
@@ -384,7 +384,7 @@ func CreatePluginGroup(c *gin.Context) {
 	setErr1, setErr2 = nil, nil
 	if unpublished {
 		setErr2 = logic.BizSetPluginGroupInfo(res, true, true)
-	}else{
+	} else {
 		setErr1 = logic.BizSetPluginGroupInfo(res, true, false)
 		setErr2 = logic.BizSetPluginGroupInfo(res, true, true)
 	}
@@ -473,7 +473,7 @@ func CreatePluginRatelimit(c *gin.Context) {
 	setErr1, setErr2 = nil, nil
 	if unpublished {
 		setErr2 = logic.BizSetPluginRatelimitInfo(res, true, true)
-	}else{
+	} else {
 		setErr1 = logic.BizSetPluginRatelimitInfo(res, true, false)
 		setErr2 = logic.BizSetPluginRatelimitInfo(res, true, true)
 	}
@@ -532,15 +532,14 @@ func DeletePluginRatelimit(c *gin.Context) {
 	c.JSON(http.StatusOK, controller.WithRet("Success"))
 }
 
-
 // getUnpublishedVal Determine the configuration type of the current operation
 func getUnpublishedVal(c *gin.Context) bool {
 	// The front-end request carries the unpublished field to determine which configuration is currently operating
 	// 1 represent true (unpublished, delay publish), 0 represent false (published, direct publish)
 	unpublishedVal := c.PostForm("unpublished")
-	if strings.EqualFold(unpublishedVal,"1") {
+	if strings.EqualFold(unpublishedVal, "1") {
 		return true
-	}else {
+	} else {
 		return false
 	}
 }
@@ -548,7 +547,7 @@ func getUnpublishedVal(c *gin.Context) bool {
 // BatchReleaseResource Publish all configuration information
 func BatchReleaseResource(c *gin.Context) {
 	fromKList, fromVList, fromErr := logic.BRGetResourceList(true) // from represent unpublished space
-	toKList, toVList, _ := logic.BRGetResourceList(false) // to represent published space
+	toKList, toVList, _ := logic.BRGetResourceList(false)          // to represent published space
 	// Do not handle toList errors
 	if fromErr != nil {
 		logger.Warnf("Batch Release Resource err, %v\n", fromErr)
@@ -575,10 +574,10 @@ func BatchReleaseResource(c *gin.Context) {
 				}
 				break
 			}
- 		}
- 		if !flag {
- 			err := logic.BRCreate(fromKTmp[len(fromKTmp)-1], fromV, logic.Resources)
- 			if err != nil {
+		}
+		if !flag {
+			err := logic.BRCreate(fromKTmp[len(fromKTmp)-1], fromV, logic.Resources)
+			if err != nil {
 				logger.Warnf("Batch Release Resource err, %v\n", err)
 				c.JSON(http.StatusOK, controller.WithError(err))
 				return
@@ -590,13 +589,12 @@ func BatchReleaseResource(c *gin.Context) {
 // BatchReleaseMethod Batch Release Method Config
 func BatchReleaseMethod(c *gin.Context) {
 
-
 }
 
 // BatchReleasePluginGroup Batch Release PluginGroup Config
 func BatchReleasePluginGroup(c *gin.Context) {
 	fromKList, fromVList, fromErr := logic.BRGetPluginGroupList(true) // from represent unpublished space
-	toKList, toVList, _ := logic.BRGetPluginGroupList(false) // to represent published space
+	toKList, toVList, _ := logic.BRGetPluginGroupList(false)          // to represent published space
 	if fromErr != nil {
 		logger.Warnf("Batch Release PluginGroup err, %v\n", fromErr)
 		c.JSON(http.StatusOK, controller.WithError(fromErr))
@@ -604,7 +602,7 @@ func BatchReleasePluginGroup(c *gin.Context) {
 	}
 	fromKTmp := strings.Split(fromKList[0], "/")
 	if toKList == nil {
-		err := logic.BRCreate(fromKTmp[len(fromKTmp)-1], fromVList[0], logic.PluginGroup);
+		err := logic.BRCreate(fromKTmp[len(fromKTmp)-1], fromVList[0], logic.PluginGroup)
 		if err != nil {
 			logger.Warnf("Batch Release PluginGroup err, %v\n", err)
 			c.JSON(http.StatusOK, controller.WithError(err))
@@ -619,17 +617,18 @@ func BatchReleasePluginGroup(c *gin.Context) {
 		}
 	}
 }
+
 // BatchReleasePluginRatelimit Batch Release PluginRatelimit Config
 func BatchReleasePluginRatelimit(c *gin.Context) {
 	_, fromVList, fromErr := logic.BRGetPluginRatelimitList(true) // from represent unpublished space
-	toKList, toVList, _ := logic.BRGetPluginRatelimitList(false) // to represent published space
+	toKList, toVList, _ := logic.BRGetPluginRatelimitList(false)  // to represent published space
 	if fromErr != nil {
 		logger.Warnf("Batch Release PluginRatelimit err, %v\n", fromErr)
 		c.JSON(http.StatusOK, controller.WithError(fromErr))
 		return
 	}
 	if toKList == nil {
-		err := logic.BRCreate("", fromVList[0], logic.Ratelimit);
+		err := logic.BRCreate("", fromVList[0], logic.Ratelimit)
 		if err != nil {
 			logger.Warnf("Batch Release PluginRatelimit err, %v\n", err)
 			c.JSON(http.StatusOK, controller.WithError(err))

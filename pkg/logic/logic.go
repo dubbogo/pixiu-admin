@@ -41,17 +41,16 @@ import (
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
 )
 
-
 const (
-	Base = "base"
-	Resources = "resources"
-	Method = "method"
-	ResourceID = "resourceId"
-	MethodID = "methodId"
+	Base        = "base"
+	Resources   = "resources"
+	Method      = "method"
+	ResourceID  = "resourceId"
+	MethodID    = "methodId"
 	PluginGroup = "pluginGroup"
-	Plugin = "plugin"
-	Filter = "filter"
-	Ratelimit = "ratelimit"
+	Plugin      = "plugin"
+	Filter      = "filter"
+	Ratelimit   = "ratelimit"
 	Unpublished = "unpublished"
 
 	ErrID = -1
@@ -99,7 +98,7 @@ func BizGetResourceList(unpublished bool) ([]fc.Resource, error) {
 	var err error
 	if unpublished {
 		kList, vList, err = config.Client.GetChildrenKVList(getUnpublishedRootPath(Resources))
-	}else {
+	} else {
 		kList, vList, err = config.Client.GetChildrenKVList(getRootPath(Resources))
 	}
 
@@ -409,7 +408,7 @@ func BizDeletePluginRatelimit(unpublished bool) error {
 func BRGetResourceList(unpublished bool) ([]string, []string, error) {
 	if unpublished {
 		return config.Client.GetChildrenKVList(getUnpublishedRootPath(Resources))
-	}else {
+	} else {
 		return config.Client.GetChildrenKVList(getRootPath(Resources))
 	}
 }
@@ -430,7 +429,7 @@ func BRGetPluginGroupList(unpublished bool) ([]string, []string, error) {
 func BRGetPluginRatelimitList(unpublished bool) ([]string, []string, error) {
 	if unpublished {
 		return config.Client.GetChildrenKVList(getUnpublishedRootPath(Ratelimit))
-	}else {
+	} else {
 		return config.Client.GetChildrenKVList(getRootPath(Ratelimit))
 	}
 }
@@ -443,16 +442,15 @@ func BRUpdate(key, value string) error {
 func BRCreate(key, value, configType string) error {
 	if strings.EqualFold(configType, Resources) {
 		return config.Client.Create(getResourceKey(key, false), value)
-	}else if strings.EqualFold(configType, Method) {
+	} else if strings.EqualFold(configType, Method) {
 
-	}else if strings.EqualFold(configType, PluginGroup) {
+	} else if strings.EqualFold(configType, PluginGroup) {
 		return config.Client.Create(getPluginGroupKey(key, false), value)
-	}else {
+	} else {
 		return config.Client.Create(getPluginRatelimitKey(false), value)
 	}
 	return errors.New("")
 }
-
 
 func getResourceKey(path string, unpublished bool) string {
 	if unpublished {
