@@ -18,8 +18,7 @@
 package main
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/configInfo"
 	"os"
 	"os/signal"
 	"strconv"
@@ -27,9 +26,6 @@ import (
 )
 
 import (
-	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
-	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/spf13/cobra"
@@ -39,10 +35,8 @@ import (
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/account"
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/auth"
-	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
-	logic "github.com/dubbogo/pixiu-admin/pkg/logic"
 )
 
 var (
@@ -139,429 +133,34 @@ func SetupRouter() *gin.Engine {
 		taR.POST("/user/getUserRole", account.GetUserRole)
 		taR.POST("/user/checkIsAdmin", account.CheckUserIsAdmin)
 
-		taR.GET("/config/api/base", GetBaseInfo)
-		taR.POST("/config/api/base/", SetBaseInfo)
-		taR.PUT("/config/api/base/", SetBaseInfo)
+		taR.GET("/config/api/base", configInfo.GetBaseInfo)
+		taR.POST("/config/api/base/", configInfo.SetBaseInfo)
+		taR.PUT("/config/api/base/", configInfo.SetBaseInfo)
 
-		taR.GET("/config/api/resource/list", GetResourceList)
-		taR.GET("/config/api/resource/detail", GetResourceDetail)
-		taR.POST("/config/api/resource", CreateResourceInfo)
-		taR.PUT("/config/api/resource", ModifyResourceInfo)
-		taR.DELETE("/config/api/resource", DeleteResourceInfo)
+		taR.GET("/config/api/resource/list", configInfo.GetResourceList)
+		taR.GET("/config/api/resource/detail", configInfo.GetResourceDetail)
+		taR.POST("/config/api/resource", configInfo.CreateResourceInfo)
+		taR.PUT("/config/api/resource", configInfo.ModifyResourceInfo)
+		taR.DELETE("/config/api/resource", configInfo.DeleteResourceInfo)
 
-		taR.GET("/config/api/resource/method/list", GetMethodList)
-		taR.GET("/config/api/resource/method/detail", GetMethodDetail)
-		taR.POST("/config/api/resource/method", CreateMethodInfo)
-		taR.PUT("/config/api/resource/method", ModifyMethodInfo)
-		taR.DELETE("/config/api/resource/method", DeleteMethodInfo)
+		taR.GET("/config/api/resource/method/list", configInfo.GetMethodList)
+		taR.GET("/config/api/resource/method/detail", configInfo.GetMethodDetail)
+		taR.POST("/config/api/resource/method", configInfo.CreateMethodInfo)
+		taR.PUT("/config/api/resource/method", configInfo.ModifyMethodInfo)
+		taR.DELETE("/config/api/resource/method", configInfo.DeleteMethodInfo)
 
-		taR.GET("/config/api/plugin_group/list", GetPluginGroupList)
-		taR.GET("/config/api/plugin_group/detail", GetPluginGroupDetail)
-		taR.POST("/config/api/plugin_group", CreatePluginGroup)
-		taR.PUT("/config/api/plugin_group", ModifyPluginGroup)
-		taR.DELETE("/config/api/plugin_group", DeletePluginGroup)
+		taR.GET("/config/api/plugin_group/list", configInfo.GetPluginGroupList)
+		taR.GET("/config/api/plugin_group/detail", configInfo.GetPluginGroupDetail)
+		taR.POST("/config/api/plugin_group", configInfo.CreatePluginGroup)
+		taR.PUT("/config/api/plugin_group", configInfo.ModifyPluginGroup)
+		taR.DELETE("/config/api/plugin_group", configInfo.DeletePluginGroup)
 
-		taR.GET("/config/api/plugin/ratelimit", GetPluginRatelimitDetail)
-		taR.POST("/config/api/plugin/ratelimit", CreatePluginRatelimit)
-		taR.PUT("/config/api/plugin/ratelimit", ModifyPluginRatelimit)
-		taR.DELETE("/config/api/plugin/ratelimit", DeletePluginRatelimit)
+		taR.GET("/config/api/plugin/ratelimit", configInfo.GetPluginRatelimitDetail)
+		taR.POST("/config/api/plugin/ratelimit", configInfo.CreatePluginRatelimit)
+		taR.PUT("/config/api/plugin/ratelimit", configInfo.ModifyPluginRatelimit)
+		taR.DELETE("/config/api/plugin/ratelimit", configInfo.DeletePluginRatelimit)
 	}
 
 	return r
 }
 
-// GetBaseInfo get pixiu base info such as name,desc
-func GetBaseInfo(c *gin.Context) {
-	conf, err := logic.BizGetBaseInfo()
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	data, _ := yaml.MarshalYML(conf)
-	c.JSON(http.StatusOK, controller.WithRet(string(data)))
-}
-
-// SetBaseInfo modify pixiu base info such as name,desc
-func SetBaseInfo(c *gin.Context) {
-	body := c.PostForm("content")
-
-	baseInfo := &config.BaseInfo{}
-	err := yaml.UnmarshalYML([]byte(body), baseInfo)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	setErr := logic.BizSetBaseInfo(baseInfo, true)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("success"))
-}
-
-// GetResourceList get all resource list
-func GetResourceList(c *gin.Context) {
-	res, err := logic.BizGetResourceList()
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	data, _ := json.Marshal(res)
-	c.JSON(http.StatusOK, controller.WithRet(string(data)))
-}
-
-// GetResourceDetail get resource detail with yml
-func GetResourceDetail(c *gin.Context) {
-	id := c.Query(controller.ResourceID)
-	res, err := logic.BizGetResourceDetail(id)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet(res))
-}
-
-// CreateResourceInfo create resource
-func CreateResourceInfo(c *gin.Context) {
-	body := c.PostForm("content")
-
-	res := &fc.Resource{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	setErr := logic.BizSetResourceInfo(res, true)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// ModifyResourceInfo modify resource
-func ModifyResourceInfo(c *gin.Context) {
-	id := c.Query(controller.ResourceID)
-	body := c.PostForm("content")
-
-	res := &fc.Resource{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	if id != "" {
-		res.ID, err = strconv.Atoi(id)
-		if err != nil {
-			logger.Warnf("resourceID not number err, %v\n", err)
-			c.JSON(http.StatusOK, controller.WithError(err))
-			return
-		}
-	}
-
-	old, err := getResourceDetail(id)
-	if err == nil && old != nil {
-		// when resource path change, should modify all method below it
-		if old.Path != res.Path {
-			afterResourcePathChange(id, res.Path)
-		}
-	}
-
-	setErr := logic.BizSetResourceInfo(res, false)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-func afterResourcePathChange(resourceId, path string) {
-	mList, err := logic.BizGetMethodList(resourceId)
-	if err != nil {
-		return
-	}
-	for i, _ := range mList {
-		m := &mList[i]
-		m.ResourcePath = path
-		setErr := logic.BizSetResourceMethod(resourceId, m, false)
-		if setErr != nil {
-			logger.Warnf("afterResourcePathChange err, %v\n", err)
-			continue
-		}
-	}
-}
-
-// DeleteResourceInfo delete resource
-func DeleteResourceInfo(c *gin.Context) {
-	id := c.Query(controller.ResourceID)
-	err := logic.BizDeleteResourceInfo(id)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// GetMethodList get all method list below one resource
-func GetMethodList(c *gin.Context) {
-	resourceId := c.Query(controller.ResourceID)
-
-	res, err := logic.BizGetMethodList(resourceId)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	data, _ := json.Marshal(res)
-	c.JSON(http.StatusOK, controller.WithRet(string(data)))
-}
-
-// GetMethodDetail get method detail with yml
-func GetMethodDetail(c *gin.Context) {
-	resourceId := c.Query(controller.ResourceID)
-	methodId := c.Query(controller.MethodID)
-	res, err := logic.BizGetMethodDetail(resourceId, methodId)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet(res))
-}
-
-// DeleteResourceInfo delete method
-func DeleteMethodInfo(c *gin.Context) {
-	resourceId := c.Query(controller.ResourceID)
-	methodId := c.Query(controller.MethodID)
-	err := logic.BizDeleteMethodInfo(resourceId, methodId)
-
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// CreateMethodInfo create method
-func CreateMethodInfo(c *gin.Context) {
-	body := c.PostForm("content")
-	resourceId := c.Query(controller.ResourceID)
-
-	res := &fc.Method{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	resource, err := getResourceDetail(resourceId)
-	if err != nil {
-		logger.Warnf("CreateMethodInfo can't query resource  err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	res.ResourcePath = resource.Path
-
-	setErr := logic.BizSetResourceMethod(resourceId, res, true)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-func getResourceDetail(id string) (*fc.Resource, error) {
-	res, err := logic.BizGetResourceDetail(id)
-	if err != nil {
-		return nil, err
-	}
-
-	resource := &fc.Resource{}
-	err = yaml.UnmarshalYML([]byte(res), resource)
-	if err != nil {
-		return nil, err
-	}
-
-	return resource, nil
-}
-
-// ModifyMethodInfo modify method
-func ModifyMethodInfo(c *gin.Context) {
-	body := c.PostForm("content")
-	resourceId := c.Query(controller.ResourceID)
-	methodId := c.Query(controller.MethodID)
-
-	res := &fc.Method{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	if methodId != "" {
-		res.ID, err = strconv.Atoi(methodId)
-		if err != nil {
-			logger.Warnf("methodID not number err, %v\n", err)
-			c.JSON(http.StatusOK, controller.WithError(err))
-			return
-		}
-	}
-
-	resource, err := getResourceDetail(resourceId)
-	if err != nil {
-		logger.Warnf("CreateMethodInfo can't query resource  err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	res.ResourcePath = resource.Path
-
-	setErr := logic.BizSetResourceMethod(resourceId, res, false)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// GetPluginGroupList get plugin group list
-func GetPluginGroupList(c *gin.Context) {
-	res, err := logic.BizGetPluginGroupList()
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	data, _ := json.Marshal(res)
-	c.JSON(http.StatusOK, controller.WithRet(string(data)))
-}
-
-// GetPluginGroupDetail get plugin group detail
-func GetPluginGroupDetail(c *gin.Context) {
-	name := c.Query("name")
-
-	res, err := logic.BizGetPluginGroupDetail(name)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet(res))
-}
-
-// CreatePluginGroup create plugin group
-func CreatePluginGroup(c *gin.Context) {
-	body := c.PostForm("content")
-
-	res := &fc.PluginsGroup{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	setErr := logic.BizSetPluginGroupInfo(res, true)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// ModifyPluginGroup modify plugin group
-func ModifyPluginGroup(c *gin.Context) {
-	body := c.PostForm("content")
-
-	res := &fc.PluginsGroup{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	setErr := logic.BizSetPluginGroupInfo(res, false)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// DeletePluginGroup delete plugin group
-func DeletePluginGroup(c *gin.Context) {
-	name := c.Query("name")
-	err := logic.BizDeletePluginGroupInfo(name)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// GetPluginRatelimitDetail get plugin ratelimit detail
-func GetPluginRatelimitDetail(c *gin.Context) {
-	res, err := logic.BizGetPluginRatelimitConfig()
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet(res))
-}
-
-// CreatePluginRatelimit create plugin ratelimit conf
-func CreatePluginRatelimit(c *gin.Context) {
-	body := c.PostForm("content")
-
-	res := &ratelimit.Config{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	setErr := logic.BizSetPluginRatelimitInfo(res, true)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// ModifyPluginRatelimit create plugin ratelimit config
-func ModifyPluginRatelimit(c *gin.Context) {
-	body := c.PostForm("content")
-
-	res := &ratelimit.Config{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-
-	setErr := logic.BizSetPluginRatelimitInfo(res, false)
-	if setErr != nil {
-		c.JSON(http.StatusOK, controller.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}
-
-// BizDeletePluginRatelimit delete plugin ratelimit config
-func DeletePluginRatelimit(c *gin.Context) {
-	err := logic.BizDeletePluginRatelimit()
-	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, controller.WithRet("Success"))
-}

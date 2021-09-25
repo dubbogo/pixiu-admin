@@ -15,25 +15,32 @@
  * limitations under the License.
  */
 
-package controller
+package configInfo
 
 import (
-	"github.com/dubbogo/pixiu-admin/pkg/config"
+	"fmt"
+	"regexp"
+	"testing"
 )
 
-const (
-	Version    = "0.1.0" // Version admin version
-	OK         = "10001"
-	ERR        = "10002"
-	RETRY      = "10003"
-)
-
-// WithError transform err to RetData
-func WithError(err error) config.RetData {
-	return config.RetData{Code: ERR, Data: err.Error()}
+func Test_method1(t *testing.T) {
+	var list1, list2 []string
+	list1 = append(list1, "a")
+	list2 = nil
+	for _, v1 := range list1 {
+		for _,v := range list2 {
+			fmt.Println("in side" + v)
+			//t.Log("inside" + v)
+		}
+		fmt.Println(v1)
+		//t.Log("outside" + v1)
+	}
 }
 
-// WithRet transform data to RetData
-func WithRet(data interface{}) config.RetData {
-	return config.RetData{Code: OK, Data: data}
+func Test_regx_split(t *testing.T) {
+	txt := "/config/api/resources/1/xxx"
+	re := regexp.MustCompile("^([^s]*)/resources/")
+	split := re.Split(txt, -1)
+	fmt.Println(split)
 }
+

@@ -21,6 +21,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 import (
@@ -40,17 +41,21 @@ import (
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
 )
 
-const Base = "base"
-const Resources = "resources"
-const Method = "method"
-const ResourceId = "resourceId"
-const MethodId = "methodId"
-const PluginGroup = "pluginGroup"
-const Plugin = "plugin"
-const Filter = "filter"
-const Ratelimit = "ratelimit"
 
-const ErrID = -1
+const (
+	Base = "base"
+	Resources = "resources"
+	Method = "method"
+	ResourceID = "resourceId"
+	MethodID = "methodId"
+	PluginGroup = "pluginGroup"
+	Plugin = "plugin"
+	Filter = "filter"
+	Ratelimit = "ratelimit"
+	Unpublished = "unpublished"
+
+	ErrID = -1
+)
 
 // BizGetBaseInfo get base info
 func BizGetBaseInfo() (*config.BaseInfo, error) {
@@ -89,8 +94,15 @@ func BizSetBaseInfo(info *config.BaseInfo, created bool) error {
 }
 
 // BizGetResourceList get resource list
-func BizGetResourceList() ([]fc.Resource, error) {
-	kList, vList, err := config.Client.GetChildrenKVList(getRootPath(Resources))
+func BizGetResourceList(unpublished bool) ([]fc.Resource, error) {
+	var kList, vList []string
+	var err error
+	if unpublished {
+		kList, vList, err = config.Client.GetChildrenKVList(getUnpublishedRootPath(Resources))
+	}else {
+		kList, vList, err = config.Client.GetChildrenKVList(getRootPath(Resources))
+	}
+
 	if err != nil {
 		logger.Errorf("BizGetResourceList err, %v\n", err)
 		return nil, perrors.WithMessage(err, "BizGetResourceList error")
@@ -116,8 +128,8 @@ func BizGetResourceList() ([]fc.Resource, error) {
 }
 
 // BizGetResourceDetail get resource detail
-func BizGetResourceDetail(id string) (string, error) {
-	key := getResourceKey(id)
+func BizGetResourceDetail(id string, unpublished bool) (string, error) {
+	key := getResourceKey(id, unpublished)
 	detail, err := config.Client.Get(key)
 	if err != nil {
 		logger.Errorf("BizGetResourceDetail err, %v\n", err)
@@ -127,7 +139,7 @@ func BizGetResourceDetail(id string) (string, error) {
 }
 
 // BizSetResourceInfo create resource
-func BizSetResourceInfo(res *fc.Resource, created bool) error {
+func BizSetResourceInfo(res *fc.Resource, created, unpublished bool) error {
 
 	if created {
 		// backups method
@@ -141,7 +153,7 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 		}
 		data, _ := yaml.MarshalYML(res)
 
-		setErr := config.Client.Create(getResourceKey(strconv.Itoa(res.ID)), string(data))
+		setErr := config.Client.Create(getResourceKey(strconv.Itoa(res.ID), unpublished), string(data))
 		if setErr != nil {
 			logger.Warnf("Create etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetResourceInfo error")
@@ -151,9 +163,9 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 			methods[i].ResourcePath = res.Path
 		}
 		// create methods
-		BizBatchCreateResourceMethod(strconv.Itoa(res.ID), methods)
+		BizBatchCreateResourceMethod(strconv.Itoa(res.ID), methods, unpublished)
 	} else {
-		key := getResourceKey(strconv.Itoa(res.ID))
+		key := getResourceKey(strconv.Itoa(res.ID), unpublished)
 		data, _ := yaml.MarshalYML(res)
 
 		// should set method in this situation
@@ -168,8 +180,8 @@ func BizSetResourceInfo(res *fc.Resource, created bool) error {
 }
 
 // BizDeleteResourceInfo delete resource
-func BizDeleteResourceInfo(id string) error {
-	key := getResourceKey(id)
+func BizDeleteResourceInfo(id string, unpublished bool) error {
+	key := getResourceKey(id, unpublished)
 	// delete all key with prefix to delete method key
 	config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
 	err := config.Client.Delete(key)
@@ -181,8 +193,8 @@ func BizDeleteResourceInfo(id string) error {
 }
 
 // BizGetMethodList get method list
-func BizGetMethodList(resourceId string) ([]fc.Method, error) {
-	key := getResourceMethodPrefixKey(resourceId)
+func BizGetMethodList(resourceId string, unpublished bool) ([]fc.Method, error) {
+	key := getResourceMethodPrefixKey(resourceId, unpublished)
 
 	_, vList, err := config.Client.GetChildrenKVList(key)
 	if err != nil {
@@ -204,8 +216,8 @@ func BizGetMethodList(resourceId string) ([]fc.Method, error) {
 }
 
 // BizGetMethodDetail get method detail
-func BizGetMethodDetail(resourceId string, methodId string) (string, error) {
-	key := getMethodKey(resourceId, methodId)
+func BizGetMethodDetail(resourceId string, methodId string, unpublished bool) (string, error) {
+	key := getMethodKey(resourceId, methodId, unpublished)
 	detail, err := config.Client.Get(key)
 	if err != nil {
 		logger.Errorf("BizGetMethodDetail err, %v\n", err)
@@ -215,7 +227,7 @@ func BizGetMethodDetail(resourceId string, methodId string) (string, error) {
 }
 
 // BizBatchCreateResourceMethod batch create method below one resource
-func BizBatchCreateResourceMethod(resourceId string, methods []fc.Method) error {
+func BizBatchCreateResourceMethod(resourceId string, methods []fc.Method, unpublished bool) error {
 
 	if len(methods) == 0 {
 		return nil
@@ -229,7 +241,7 @@ func BizBatchCreateResourceMethod(resourceId string, methods []fc.Method) error 
 			logger.Warnf("can't get id from etcd")
 			continue
 		}
-		kList = append(kList, getMethodKey(resourceId, strconv.Itoa(method.ID)))
+		kList = append(kList, getMethodKey(resourceId, strconv.Itoa(method.ID), unpublished))
 		data, _ := yaml.MarshalYML(method)
 		vList = append(vList, string(data))
 	}
@@ -243,11 +255,11 @@ func BizBatchCreateResourceMethod(resourceId string, methods []fc.Method) error 
 }
 
 // BizSetResourceMethod create or update method below specific path
-func BizSetResourceMethod(resourceId string, method *fc.Method, created bool) error {
+func BizSetResourceMethod(resourceId string, method *fc.Method, created, unpublished bool) error {
 
 	if created {
 		method.ID = getMethodId()
-		key := getMethodKey(resourceId, strconv.Itoa(method.ID))
+		key := getMethodKey(resourceId, strconv.Itoa(method.ID), unpublished)
 
 		if method.ID == ErrID {
 			logger.Warnf("can't get id from etcd")
@@ -262,7 +274,7 @@ func BizSetResourceMethod(resourceId string, method *fc.Method, created bool) er
 		}
 	} else {
 		data, _ := yaml.MarshalYML(method)
-		key := getMethodKey(resourceId, strconv.Itoa(method.ID))
+		key := getMethodKey(resourceId, strconv.Itoa(method.ID), unpublished)
 		err := config.Client.Update(key, string(data))
 		if err != nil {
 			logger.Warnf("BizSetResourceMethod etcd error, %v\n", err)
@@ -274,8 +286,8 @@ func BizSetResourceMethod(resourceId string, method *fc.Method, created bool) er
 }
 
 // BizDeleteMethodInfo delete method
-func BizDeleteMethodInfo(resourceId string, methodId string) error {
-	key := getMethodKey(resourceId, methodId)
+func BizDeleteMethodInfo(resourceId string, methodId string, unpublished bool) error {
+	key := getMethodKey(resourceId, methodId, unpublished)
 	err := config.Client.Delete(key)
 	if err != nil {
 		logger.Warnf("BizDeleteMethodInfo, %v\n", err)
@@ -285,8 +297,8 @@ func BizDeleteMethodInfo(resourceId string, methodId string) error {
 }
 
 // BizGetPluginGroupList get plugin group list
-func BizGetPluginGroupList() ([]fc.PluginsGroup, error) {
-	key := getPluginGroupPrefixKey()
+func BizGetPluginGroupList(unpublished bool) ([]fc.PluginsGroup, error) {
+	key := getPluginGroupPrefixKey(unpublished)
 
 	_, vList, err := config.Client.GetChildrenKVList(key)
 	if err != nil {
@@ -308,8 +320,8 @@ func BizGetPluginGroupList() ([]fc.PluginsGroup, error) {
 }
 
 // BizGetPluginGroupDetail get plugin group detail
-func BizGetPluginGroupDetail(name string) (string, error) {
-	key := getPluginGroupKey(name)
+func BizGetPluginGroupDetail(name string, unpublished bool) (string, error) {
+	key := getPluginGroupKey(name, unpublished)
 	detail, err := config.Client.Get(key)
 	if err != nil {
 		logger.Errorf("BizGetPluginGroupDetail err, %v\n", err)
@@ -319,17 +331,17 @@ func BizGetPluginGroupDetail(name string) (string, error) {
 }
 
 // BizSetPluginGroupInfo create or update plugin group
-func BizSetPluginGroupInfo(res *fc.PluginsGroup, created bool) error {
+func BizSetPluginGroupInfo(res *fc.PluginsGroup, created, unpublished bool) error {
 
 	data, _ := yaml.MarshalYML(res)
 	if created {
-		setErr := config.Client.Create(getPluginGroupKey(res.GroupName), string(data))
+		setErr := config.Client.Create(getPluginGroupKey(res.GroupName, unpublished), string(data))
 		if setErr != nil {
 			logger.Warnf("create etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
 		}
 	} else {
-		setErr := config.Client.Update(getPluginGroupKey(res.GroupName), string(data))
+		setErr := config.Client.Update(getPluginGroupKey(res.GroupName, unpublished), string(data))
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
@@ -340,8 +352,8 @@ func BizSetPluginGroupInfo(res *fc.PluginsGroup, created bool) error {
 }
 
 // BizDeletePluginGroupInfo delete plugin group
-func BizDeletePluginGroupInfo(name string) error {
-	key := getPluginGroupKey(name)
+func BizDeletePluginGroupInfo(name string, unpublished bool) error {
+	key := getPluginGroupKey(name, unpublished)
 	err := config.Client.Delete(key)
 	if err != nil {
 		logger.Warnf("BizDeletePluginGroupInfo, %v\n", err)
@@ -351,8 +363,8 @@ func BizDeletePluginGroupInfo(name string) error {
 }
 
 // BizGetPluginGroupDetail get plugin group detail
-func BizGetPluginRatelimitConfig() (string, error) {
-	key := getPluginRatelimitKey()
+func BizGetPluginRatelimitConfig(unpublished bool) (string, error) {
+	key := getPluginRatelimitKey(unpublished)
 	detail, err := config.Client.Get(key)
 	if err != nil {
 		logger.Errorf("BizGetPluginRatelimitConfig err, %v\n", err)
@@ -362,17 +374,17 @@ func BizGetPluginRatelimitConfig() (string, error) {
 }
 
 // BizSetPluginGroupInfo create or update plugin group
-func BizSetPluginRatelimitInfo(res *ratelimit.Config, created bool) error {
+func BizSetPluginRatelimitInfo(res *ratelimit.Config, created bool, unpublished bool) error {
 
 	data, _ := yaml.MarshalYML(res)
 	if created {
-		setErr := config.Client.Create(getPluginRatelimitKey(), string(data))
+		setErr := config.Client.Create(getPluginRatelimitKey(unpublished), string(data))
 		if setErr != nil {
 			logger.Warnf("create etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
 		}
 	} else {
-		setErr := config.Client.Update(getPluginRatelimitKey(), string(data))
+		setErr := config.Client.Update(getPluginRatelimitKey(unpublished), string(data))
 		if setErr != nil {
 			logger.Warnf("update etcd error, %v\n", setErr)
 			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
@@ -383,8 +395,8 @@ func BizSetPluginRatelimitInfo(res *ratelimit.Config, created bool) error {
 }
 
 // BizDeletePluginRatelimit delete plugin ratelimit config
-func BizDeletePluginRatelimit() error {
-	key := getPluginRatelimitKey()
+func BizDeletePluginRatelimit(unpublished bool) error {
+	key := getPluginRatelimitKey(unpublished)
 	err := config.Client.Delete(key)
 	if err != nil {
 		logger.Warnf("BizDeletePluginRatelimit, %v\n", err)
@@ -393,40 +405,99 @@ func BizDeletePluginRatelimit() error {
 	return nil
 }
 
-func getResourceKey(path string) string {
+// BRGetResourceList GetResourceList
+func BRGetResourceList(unpublished bool) ([]string, []string, error) {
+	if unpublished {
+		return config.Client.GetChildrenKVList(getUnpublishedRootPath(Resources))
+	}else {
+		return config.Client.GetChildrenKVList(getRootPath(Resources))
+	}
+}
+
+// BRGetMethodList GetMethodList
+func BRGetMethodList(resourceId string, unpublished bool) ([]string, []string, error) {
+	key := getResourceMethodPrefixKey(resourceId, unpublished)
+	return config.Client.GetChildrenKVList(key)
+}
+
+// BRGetPluginGroupList GetPluginGroupList
+func BRGetPluginGroupList(unpublished bool) ([]string, []string, error) {
+	key := getPluginGroupPrefixKey(unpublished)
+	return config.Client.GetChildrenKVList(key)
+}
+
+// BRGetPluginRatelimitList GetPluginRatelimitList
+func BRGetPluginRatelimitList(unpublished bool) ([]string, []string, error) {
+	if unpublished {
+		return config.Client.GetChildrenKVList(getUnpublishedRootPath(Ratelimit))
+	}else {
+		return config.Client.GetChildrenKVList(getRootPath(Ratelimit))
+	}
+}
+
+// BRUpdate
+func BRUpdate(key, value string) error {
+	return config.Client.Update(key, value)
+}
+
+func BRCreate(key, value, configType string) error {
+	if strings.EqualFold(configType, Resources) {
+		return config.Client.Create(getResourceKey(key, false), value)
+	}else if strings.EqualFold(configType, Method) {
+
+	}else if strings.EqualFold(configType, PluginGroup) {
+		return config.Client.Create(getPluginGroupKey(key, false), value)
+	}else {
+		return config.Client.Create(getPluginRatelimitKey(false), value)
+	}
+	return errors.New("")
+}
+
+
+func getResourceKey(path string, unpublished bool) string {
+	if unpublished {
+		return getUnpublishedRootPath(Resources) + "/" + path
+	}
 	return getRootPath(Resources) + "/" + path
 }
 
-func getPluginRatelimitKey() string {
-	return getFilterPrefixKey() + "/" + Ratelimit
+func getPluginRatelimitKey(unpublished bool) string {
+	return getFilterPrefixKey(unpublished) + "/" + Ratelimit
 }
 
-func getPluginGroupKey(name string) string {
-	return getPluginGroupPrefixKey() + "/" + name
+func getPluginGroupKey(name string, unpublished bool) string {
+	return getPluginGroupPrefixKey(unpublished) + "/" + name
 }
 
-func getPluginGroupPrefixKey() string {
+func getPluginGroupPrefixKey(unpublished bool) string {
+	if unpublished {
+		return getUnpublishedRootPath(PluginGroup)
+	}
 	return getRootPath(PluginGroup)
 }
 
-func getFilterPrefixKey() string {
+func getFilterPrefixKey(unpublished bool) string {
+	if unpublished {
+		return getUnpublishedRootPath(Filter)
+	}
 	return getRootPath(Filter)
 }
 
-func getResourceMethodPrefixKey(path string) string {
-	return getResourceKey(path) + "/" + Method
+func getResourceMethodPrefixKey(path string, unpublished bool) string {
+	return getResourceKey(path, unpublished) + "/" + Method
 }
 
-func getMethodKey(path string, method string) string {
-	return getResourceMethodPrefixKey(path) + "/" + method
+func getMethodKey(path string, method string, unpublished bool) string {
+	return getResourceMethodPrefixKey(path, unpublished) + "/" + method
 }
 
+// create method, No need to judge whether to publish or not
 func getResourceId() int {
-	return loopGetId(getRootPath(ResourceId))
+	return loopGetId(getRootPath(ResourceID))
 }
 
 func getMethodId() int {
-	return loopGetId(getRootPath(MethodId))
+	return loopGetId(getRootPath(MethodID))
 }
 
 func loopGetId(k string) int {
@@ -482,6 +553,10 @@ func loopGetId(k string) int {
 
 func getRootPath(key string) string {
 	return config.Bootstrap.GetPath() + "/" + key
+}
+
+func getUnpublishedRootPath(key string) string {
+	return config.Bootstrap.GetPath() + "/" + Unpublished + "/" + key
 }
 
 func getCheckResourceRegexp() *regexp.Regexp {
