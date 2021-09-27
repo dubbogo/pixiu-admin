@@ -18,7 +18,6 @@
 package main
 
 import (
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/configInfo"
 	"os"
 	"os/signal"
 	"strconv"
@@ -35,6 +34,7 @@ import (
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/account"
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/auth"
+	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/configInfo"
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
 )
@@ -159,6 +159,12 @@ func SetupRouter() *gin.Engine {
 		taR.POST("/config/api/plugin/ratelimit", configInfo.CreatePluginRatelimit)
 		taR.PUT("/config/api/plugin/ratelimit", configInfo.ModifyPluginRatelimit)
 		taR.DELETE("/config/api/plugin/ratelimit", configInfo.DeletePluginRatelimit)
+
+		// Which request method to choose, Temporarily choose put method
+		taR.PUT("/config/api/resource/publish", configInfo.BatchReleaseResource)
+		taR.PUT("/config/api/resource/method/publish", configInfo.BatchReleaseMethod)
+		taR.PUT("/config/api/plugin_group/publish", configInfo.BatchReleasePluginGroup)
+		taR.PUT("/config/api/plugin/ratelimit/publish", configInfo.BatchReleasePluginRatelimit)
 	}
 
 	return r

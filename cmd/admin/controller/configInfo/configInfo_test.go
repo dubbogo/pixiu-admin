@@ -19,7 +19,7 @@ package configInfo
 
 import (
 	"fmt"
-	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -39,7 +39,10 @@ func Test_method1(t *testing.T) {
 
 func Test_regx_split(t *testing.T) {
 	txt := "/config/api/resources/1/xxx"
-	re := regexp.MustCompile("^([^s]*)/resources/")
-	split := re.Split(txt, -1)
+	//re := regexp.MustCompile("\\(?<=config\\).+\\(?=resources\\)")
+	pre := "/config/api/"
+	//re := regexp.MustCompile("^/resources/1")
+	split := strings.TrimPrefix(txt, pre)
+	//split := re.Split(txt,-1)
 	fmt.Println(split)
 }

@@ -19,18 +19,26 @@ package configInfo
 
 import (
 	"encoding/json"
+	"net/http"
+	"strconv"
+	"strings"
+)
+
+import (
 	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
 	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/pkg/errors"
+)
+
+import (
 	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
 	"github.com/dubbogo/pixiu-admin/pkg/logic"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 // GetBaseInfo get pixiu base info such as name,desc
@@ -588,7 +596,7 @@ func BatchReleaseResource(c *gin.Context) {
 
 // BatchReleaseMethod Batch Release Method Config
 func BatchReleaseMethod(c *gin.Context) {
-
+	// todo
 }
 
 // BatchReleasePluginGroup Batch Release PluginGroup Config

@@ -32,9 +32,12 @@ var db *sql.DB
 
 func init() {
 	var err error
+
+	//// Get database properties from configuration file
+	//username, password, host, port, dbname := config.Bootstrap.GetMysqlConfig()
+	//dataSourceName := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?charset=utf8"
+	//db, err = sql.Open(MysqlDriver, dataSourceName)
 	db, err = sql.Open(MysqlDriver, "root:123456@tcp(127.0.0.1:3306)/pixiu")
-	// TODO: Get database properties from configuration file
-	// var dsn string = conf.Configure["mysql_username"] + ":" + conf.Configure["mysql_password"] + "@tcp(" + conf.Configure["mysql_host"] + ":" + conf.Configure["mysql_port"] + ")/" + conf.Configure["mysql_dbname"] + "?charset=utf8"
 	if err != nil {
 		panic(err)
 	}
