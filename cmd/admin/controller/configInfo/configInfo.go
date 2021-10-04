@@ -111,7 +111,6 @@ func CreateResourceInfo(c *gin.Context) {
 	}
 
 	var setErr1, setErr2 error // err1 represent write publish space, err2 represent write unpublished space
-	setErr1, setErr2 = nil, nil
 	if unpublished {
 		setErr2 = logic.BizSetResourceInfo(res, true, true)
 	} else {
@@ -389,7 +388,6 @@ func CreatePluginGroup(c *gin.Context) {
 	}
 
 	var setErr1, setErr2 error // err1 represent write publish space, err2 represent write unpublished space
-	setErr1, setErr2 = nil, nil
 	if unpublished {
 		setErr2 = logic.BizSetPluginGroupInfo(res, true, true)
 	} else {
@@ -478,7 +476,6 @@ func CreatePluginRatelimit(c *gin.Context) {
 		return
 	}
 	var setErr1, setErr2 error // err1 represent write publish space, err2 represent write unpublished space
-	setErr1, setErr2 = nil, nil
 	if unpublished {
 		setErr2 = logic.BizSetPluginRatelimitInfo(res, true, true)
 	} else {

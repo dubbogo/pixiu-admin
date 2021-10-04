@@ -162,7 +162,7 @@ func BizSetResourceInfo(res *fc.Resource, created, unpublished bool) error {
 			methods[i].ResourcePath = res.Path
 		}
 		// create methods
-		BizBatchCreateResourceMethod(strconv.Itoa(res.ID), methods, unpublished)
+		_ = BizBatchCreateResourceMethod(strconv.Itoa(res.ID), methods, unpublished)
 	} else {
 		key := getResourceKey(strconv.Itoa(res.ID), unpublished)
 		data, _ := yaml.MarshalYML(res)
