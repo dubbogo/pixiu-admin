@@ -175,7 +175,7 @@ func afterResourcePathChange(resourceId, path string, unpublished bool) {
 	if err != nil {
 		return
 	}
-	for i, _ := range mList {
+	for i := range mList {
 		m := &mList[i]
 		m.ResourcePath = path
 		setErr := logic.BizSetResourceMethod(resourceId, m, false, unpublished)
