@@ -15,36 +15,34 @@
  * limitations under the License.
  */
 
-package database
+package configInfo
 
 import (
-	"database/sql"
+	"fmt"
+	"strings"
+	"testing"
 )
 
-import (
-	_ "github.com/go-sql-driver/mysql"
-)
-
-// MysqlDriver
-const MysqlDriver = "mysql"
-
-var db *sql.DB
-
-func init() {
-	var err error
-
-	//// Get database properties from configuration file
-	//username, password, host, port, dbname := config.Bootstrap.GetMysqlConfig()
-	//dataSourceName := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?charset=utf8"
-	//db, err = sql.Open(MysqlDriver, dataSourceName)
-	db, err = sql.Open(MysqlDriver, "root:123456@tcp(127.0.0.1:3306)/pixiu")
-	if err != nil {
-		panic(err)
+func Test_method1(t *testing.T) {
+	var list1, list2 []string
+	list1 = append(list1, "a")
+	list2 = nil
+	for _, v1 := range list1 {
+		for _, v := range list2 {
+			fmt.Println("in side" + v)
+			//t.Log("inside" + v)
+		}
+		fmt.Println(v1)
+		//t.Log("outside" + v1)
 	}
-	db.SetMaxOpenConns(20)
-	db.SetMaxIdleConns(20)
 }
 
-func GetConnection() *sql.DB {
-	return db
+func Test_regx_split(t *testing.T) {
+	txt := "/config/api/resources/1/xxx"
+	//re := regexp.MustCompile("\\(?<=config\\).+\\(?=resources\\)")
+	pre := "/config/api/"
+	//re := regexp.MustCompile("^/resources/1")
+	split := strings.TrimPrefix(txt, pre)
+	//split := re.Split(txt,-1)
+	fmt.Println(split)
 }

@@ -40,8 +40,9 @@ var (
 
 // AdminBootstrap admin bootstrap config
 type AdminBootstrap struct {
-	Server     ServerConfig `yaml:"server" json:"server" mapstructure:"server"`
-	EtcdConfig EtcdConfig   `yaml:"etcd" json:"etcd" mapstructure:"etcd"`
+	Server      ServerConfig `yaml:"server" json:"server" mapstructure:"server"`
+	EtcdConfig  EtcdConfig   `yaml:"etcd" json:"etcd" mapstructure:"etcd"`
+	MysqlConfig MysqlConfig  `yaml:"mysql" json:"mysql" mapstructure:"mysql"`
 }
 
 // GetAddress get etcd server address
@@ -54,6 +55,11 @@ func (a *AdminBootstrap) GetPath() string {
 	return a.EtcdConfig.Path
 }
 
+//// GetMysqlConfig get mysql config
+//func (a *AdminBootstrap) GetMysqlConfig() (string, string, string, string, string) {
+//	return a.MysqlConfig.Username, a.MysqlConfig.Password, a.MysqlConfig.Host, a.MysqlConfig.Port, a.MysqlConfig.Dbname
+//}
+
 // ServerConfig admin http server config
 type ServerConfig struct {
 	Address string `yaml:"address" json:"address" mapstructure:"address"`
@@ -63,6 +69,15 @@ type ServerConfig struct {
 type EtcdConfig struct {
 	Address string `yaml:"address" json:"admin" mapstructure:"admin"`
 	Path    string `yaml:"path" json:"path" mapstructure:"path"`
+}
+
+// MysqlConfig admin mysql database config
+type MysqlConfig struct {
+	Username string `yaml:"username" json:"username" mapstructure:"username"`
+	Password string `yaml:"password" json:"password" mapstructure:"password"`
+	Host     string `yaml:"host" json:"host" mapstructure:"host"`
+	Port     string `yaml:"port" json:"port" mapstructure:"port"`
+	Dbname   string `yaml:"dbname" json:"dbname" mapstructure:"dbname"`
 }
 
 // BaseInfo base info
