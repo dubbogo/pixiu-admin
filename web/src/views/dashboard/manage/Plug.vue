@@ -1,21 +1,9 @@
-<!--Licensed to the Apache Software Foundation (ASF) under one or more
-contributor license agreements.  See the NOTICE file distributed with
-this work for additional information regarding copyright ownership.
-The ASF licenses this file to You under the Apache License, Version 2.0
-(the "License"); you may not use this file except in compliance with
-the License.  You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.-->
-
 <template>
     <CustomLayout >
     <div class="custom-body">
+      <div>
+        <CommonTitle title="插件配置"></CommonTitle>
+      </div>
       <!-- <div class="custom-tools">
         <div class="table-head">
             <div class="custom-tools__info">基础信息</div>
@@ -109,7 +97,7 @@ limitations under the License.-->
       </div>
     </div>
     <el-dialog
-                title="新增插件组"
+                title="新增"
                 :visible.sync="createDialogVisible"
                 width="640px"
                 :before-close="handleClose">
@@ -123,7 +111,7 @@ limitations under the License.-->
         </el-dialog>
 
             <el-dialog
-                title="编辑插件组"
+                title="查看修改"
                 :visible.sync="updateDialogVisible"
                 width="640px"
                 :before-close="handleClose">

@@ -1,24 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getToken, setToken, removeToken, getLocalStorage, setLocalStorage,clearLocalStorage } from '@/utils/auth'
-import fetch from '@/utils/fetch'
+import fetch from '@/utils/tafetch'
 import api from '@/api'
 Vue.use(Vuex)
 
@@ -28,7 +11,7 @@ export default new Vuex.Store({
     openedTab: ['index'],
     activeTab: '',
     token:getToken(),
-    operatorInfo:getLocalStorage('operatorInfo') || {},//系统操作员
+    operatorInfo:getLocalStorage('info') || {},//系统操作员
     customerInfo:{},//ETC客户
     modelType:'',//当前用户正在操作的模块
     cancelVehicle: false,//当前用户是否从新增车辆中返回的
@@ -92,23 +75,21 @@ export default new Vuex.Store({
     Login({ commit }, userInfo) {
       console.log(userInfo)
       return new Promise((resolve, reject) => {
+        
         fetch({
           url: api['login'].url || '',
           method: 'post',
-          data: {
-           ...userInfo
-          }
+          data: userInfo
           
         }).then(res => {
+          console.log(res, "======>21")
           const data = res
-          if(res.code==200){
             // console.log(data.data.token)
-            // setToken(data.data.token)
-            // commit('SET_TOKEN', data.data.token);
-          }
-            setLocalStorage('expireTime', new Date().getTime() + 1000*60*60*24*7)
-            setLocalStorage('operatorInfo',data);
-            commit('SET_OPERATORINFO',data);
+          setToken(data.token)
+          commit('SET_TOKEN', data.token);
+          setLocalStorage('expireTime', new Date().getTime() + 1000*60*60*24*7)
+          setLocalStorage('operatorInfo',data);
+          commit('SET_OPERATORINFO',data);
           
           
           resolve()
@@ -154,8 +135,8 @@ export default new Vuex.Store({
           commit('SET_APPOINTINFO',{})
 
           removeToken();
-          clearLocalStorage('roles');
-
+          clearLocalStorage('operatorInfo');
+          clearLocalStorage('expireTime');
           resolve()
         }).catch(error => {
           reject(error)
@@ -172,8 +153,8 @@ export default new Vuex.Store({
         commit('SET_APPOINTINFO',{})
 
         removeToken();
-        // clearLocalStorage('operatorInfo');
-
+        clearLocalStorage('operatorInfo');
+        clearLocalStorage('expireTime');
 
         resolve()
       })

@@ -1,20 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import axios from 'axios'
 import {Message} from 'element-ui'
 import {getToken, getLocalStorage, setLocalStorage} from '@/utils/auth'
@@ -27,7 +10,7 @@ import wsConsts from '@/utils/wsConsts'
 
 // 创建axios实例
 const service = axios.create({
-    baseURL: "/", // api的base_url
+    baseURL: "/config", // api的base_url
     dataType:"json",
     headers: {"Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryn8D9asOnAnEU4Js0" },
     timeout: 5000 // 请求超时时间
@@ -36,10 +19,12 @@ const service = axios.create({
 
 // request拦截器
 service.interceptors.request.use(config => {
-    // console.log(store.getters)
-    // if (store.getters.token) {
-    //     config.headers.token = getToken();
-    // }
+    console.log(store.getters)
+    let tk = getLocalStorage('operatorInfo').token
+    if (tk && tk != '') {
+        config.headers.token = tk;
+        config.headers.username = getLocalStorage('operatorInfo').username;
+    }
 
 
     // if (config.method.toLowerCase() !== 'get' && Object.keys(config.data).length > 0) {

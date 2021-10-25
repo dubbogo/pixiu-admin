@@ -1,28 +1,16 @@
-<!--Licensed to the Apache Software Foundation (ASF) under one or more
-contributor license agreements.  See the NOTICE file distributed with
-this work for additional information regarding copyright ownership.
-The ASF licenses this file to You under the Apache License, Version 2.0
-(the "License"); you may not use this file except in compliance with
-the License.  You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.-->
-
 <template>
     <CustomLayout >
     <div class="custom-body">
+      <div>
+        <CommonTitle title="概览"></CommonTitle>
+      </div>
       <!-- <div class="custom-tools">
         <div class="table-head">
           <div class="custom-tools__info">基础信息</div>
           <el-button type="primary" icon="el-icon-plus" size="mini"
                      @click="handleChange">修改</el-button>
         </div>
-
+        
         <div class="custom-tools__content">
           <el-form :model="form"
                  :inline="true"
@@ -49,20 +37,20 @@ limitations under the License.-->
                   header-row-class-name="custom-table-header"
                   @selection-change="handleSelectionChange"
                   style="width: 100%">
-          <el-table-column
+          <el-table-column 
                            prop="id"
                            label="ID">
-
+            
           </el-table-column>
-          <!-- <el-table-column
+          <el-table-column 
                            prop=""
                            label="映射服务">
-
-          </el-table-column> -->
+            
+          </el-table-column>
           <el-table-column prop="path"
                            label="路径">
           </el-table-column>
-          <el-table-column
+          <el-table-column 
                            prop="type"
                            label="类型">
           </el-table-column>
@@ -84,7 +72,7 @@ limitations under the License.-->
 
         <div class="custom-pagination"
              style="float:right">
-
+          
           <div style="display: flex;">
             <div>
               总共<span>{{ pagination.total }}</span>条记录<i class="custom-pagination__interval"></i>每页显示
@@ -215,13 +203,12 @@ export default {
       });
     },
     handleLook(row) {
-
-      this.$router.push(
-        { path: '/Mapping?resourceId=' + row.id,
-          query: {
-            resourceId : row.id
-          }
-        })
+      this.$router.push({
+        path:'/Mapping',
+        query:{
+          queryId: row.id
+        }
+      })
     },
     handleClose() {
       this.dialogVisible = false
@@ -235,8 +222,7 @@ export default {
              this.tableData = JSON.parse(res.data)
              this.pagination.total = this.tableData.length
           } else {
-             this.tableData = []
-             this.pagination.total = this.tableData.length
+            
           }
         })
         .catch((err) => {
@@ -244,7 +230,7 @@ export default {
         })
     },
      //获取基础信息
-    init() {
+    init() {  
       this.$get('/config/api/base')
         .then((res) => {
           if (res.code == 10001) {
@@ -278,7 +264,7 @@ export default {
             })
             this.monacoEditored.dispose()
             this.init()
-          }
+          } 
         })
         .catch((err) => {
           console.log(err)
@@ -288,7 +274,7 @@ export default {
       let formData = new FormData();
       let data = this.monacoEditor.getValue()
       formData.append('content', data);
-
+      
       this.$post('/config/api/resource', formData)
         .then((res) => {
           if (res.code == 10001) {
@@ -296,7 +282,7 @@ export default {
             this.getResourceList()
             console.log(res)
           } else {
-
+            
           }
         })
         .catch((err) => {
@@ -317,7 +303,7 @@ export default {
             this.getResourceList()
             console.log(res)
           } else {
-
+            
           }
         })
         .catch((err) => {
