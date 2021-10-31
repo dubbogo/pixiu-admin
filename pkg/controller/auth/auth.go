@@ -18,6 +18,7 @@
 package auth
 
 import (
+	"github.com/dubbogo/pixiu-admin/pkg/controller"
 	"log"
 	"net/http"
 	"time"
@@ -29,10 +30,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/pkg/errors"
-)
-
-import (
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 )
 
 // Check token

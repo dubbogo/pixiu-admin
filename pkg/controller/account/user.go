@@ -18,6 +18,8 @@
 package account
 
 import (
+	"github.com/dubbogo/pixiu-admin/pkg/controller"
+	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
 	"net/http"
 	"time"
 )
@@ -29,8 +31,6 @@ import (
 )
 
 import (
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/auth"
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
 )
 

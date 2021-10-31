@@ -1,37 +1,24 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package config
 
 import (
+	etcdv3 "github.com/dubbogo/gost/database/kv/etcd/v3"
+	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
+	"github.com/dubbogo/pixiu-admin/pkg/logger"
+	perrors "github.com/pkg/errors"
 	"strings"
 	"time"
 )
 
-import (
-	etcdv3 "github.com/dubbogo/gost/database/kv/etcd/v3"
+type Server struct {
+	Zap    Zap    `mapstructure:"zap" json:"zap" yaml:"zap"`
+	Redis  Redis  `mapstructure:"redis" json:"redis" yaml:"redis"`
+	System System `mapstructure:"system" json:"system" yaml:"system"`
 
-	perrors "github.com/pkg/errors"
-)
+	AutoCode Autocode `mapstructure:"autoCode" json:"autoCode" yaml:"autoCode"`
 
-import (
-	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
-	"github.com/dubbogo/pixiu-admin/pkg/logger"
-)
+	// gorm
+	Mysql Mysql `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
+}
 
 var (
 	Client    *etcdv3.Client

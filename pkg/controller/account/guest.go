@@ -18,6 +18,8 @@
 package account
 
 import (
+	"github.com/dubbogo/pixiu-admin/pkg/controller"
+	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
 	"log"
 	"net/http"
 	"time"
@@ -32,12 +34,17 @@ import (
 )
 
 import (
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/auth"
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
 	"github.com/dubbogo/pixiu-admin/pkg/utils"
 )
 
+// @Tags Register
+// @Summary 用户注册
+// @Produce  application/json
+// @Param username formData string true "用户名"
+// @Param password formData string true "密码"
+// @Success 200 {string} string "{"code":"","data":""}"
+// @Router /register [post]
 func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")

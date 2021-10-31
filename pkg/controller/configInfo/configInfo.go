@@ -19,6 +19,7 @@ package configInfo
 
 import (
 	"encoding/json"
+	"github.com/dubbogo/pixiu-admin/pkg/controller"
 	"net/http"
 	"strconv"
 	"strings"
@@ -34,7 +35,6 @@ import (
 )
 
 import (
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
