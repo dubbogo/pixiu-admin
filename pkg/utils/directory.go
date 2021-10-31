@@ -1,9 +1,13 @@
 package utils
 
 import (
-	"github.com/dubbogo/pixiu-admin/pkg/global"
-	"go.uber.org/zap"
 	"os"
+)
+
+import (
+	"github.com/dubbogo/pixiu-admin/pkg/global"
+
+	"go.uber.org/zap"
 )
 
 func PathExists(path string) (bool, error) {

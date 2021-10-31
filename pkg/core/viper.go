@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+)
 
+import (
 	"github.com/dubbogo/pixiu-admin/pkg/global"
 	"github.com/dubbogo/pixiu-admin/pkg/utils"
 
 	"github.com/fsnotify/fsnotify"
+
 	"github.com/spf13/viper"
 )
 

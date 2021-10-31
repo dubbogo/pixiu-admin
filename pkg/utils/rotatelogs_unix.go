@@ -3,12 +3,17 @@
 package utils
 
 import (
-	"github.com/dubbogo/pixiu-admin/pkg/global"
-	zaprotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"go.uber.org/zap/zapcore"
 	"os"
 	"path"
 	"time"
+)
+
+import (
+	"github.com/dubbogo/pixiu-admin/pkg/global"
+
+	zaprotatelogs "github.com/lestrrat-go/file-rotatelogs"
+
+	"go.uber.org/zap/zapcore"
 )
 
 func GetWriteSyncer() (zapcore.WriteSyncer, error) {

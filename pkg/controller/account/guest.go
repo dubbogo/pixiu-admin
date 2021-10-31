@@ -18,8 +18,6 @@
 package account
 
 import (
-	"github.com/dubbogo/pixiu-admin/pkg/controller"
-	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
 	"log"
 	"net/http"
 	"time"
@@ -28,14 +26,14 @@ import (
 import (
 	"github.com/dgrijalva/jwt-go"
 
+	"github.com/dubbogo/pixiu-admin/pkg/config"
+	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
+	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
+	"github.com/dubbogo/pixiu-admin/pkg/utils"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/pkg/errors"
-)
-
-import (
-	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
-	"github.com/dubbogo/pixiu-admin/pkg/utils"
 )
 
 // @Tags Register
@@ -70,9 +68,9 @@ func Register(c *gin.Context) {
 	password = utils.Md5(password)
 	err := account.Register(username, password)
 	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 	} else {
-		c.JSON(http.StatusOK, controller.WithRet("Register successfully, please login!"))
+		c.JSON(http.StatusOK, config.WithRet("Register successfully, please login!"))
 	}
 }
 
@@ -94,7 +92,7 @@ func Login(c *gin.Context) {
 	if flag {
 		generateToken(c, username)
 	} else {
-		c.JSON(http.StatusOK, controller.WithError(errors.New("Authentication failed, login information is wrong!")))
+		c.JSON(http.StatusOK, config.WithError(errors.New("Authentication failed, login information is wrong!")))
 	}
 }
 
@@ -111,7 +109,7 @@ func generateToken(c *gin.Context, username string) {
 	token, err := j.CreateToken(claims)
 
 	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 		return
 	}
 
@@ -121,5 +119,5 @@ func generateToken(c *gin.Context, username string) {
 		Username: username,
 		Token:    token,
 	}
-	c.JSON(http.StatusOK, controller.WithRet(data))
+	c.JSON(http.StatusOK, config.WithRet(data))
 }

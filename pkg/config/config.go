@@ -1,12 +1,17 @@
 package config
 
 import (
-	etcdv3 "github.com/dubbogo/gost/database/kv/etcd/v3"
-	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
-	"github.com/dubbogo/pixiu-admin/pkg/logger"
-	perrors "github.com/pkg/errors"
 	"strings"
 	"time"
+)
+
+import (
+	etcdv3 "github.com/dubbogo/gost/database/kv/etcd/v3"
+
+	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
+	"github.com/dubbogo/pixiu-admin/pkg/logger"
+
+	perrors "github.com/pkg/errors"
 )
 
 type Server struct {

@@ -50,7 +50,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"\"}",
+                        "description": "{\"code\":\"\",\"data\":\"\"}",
                         "schema": {
                             "type": "string"
                         }
