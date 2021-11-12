@@ -47,7 +47,7 @@ export default {
   height: 6px;
   border-radius: 4px;
   /*高宽分别对应横竖滚动条的尺寸*/
-//background: #4494f9;
+/*background: #4494f9;*/
   -webkit-box-shadow: inset 1px 0 1px rgba(0, 0, 0, 0.2);
 }
 ::-webkit-scrollbar-button{/*滚动条两端的按钮，可以用display:none让其不显示，也可以添加背景图片，颜色改变显示效果（位置2）*/
