@@ -22,12 +22,10 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
-)
-
-import (
 	"github.com/dubbogo/pixiu-admin/pkg/dao"
 	"github.com/dubbogo/pixiu-admin/pkg/dao/database"
+
+	"github.com/pkg/errors"
 )
 
 type GuestDao struct {
