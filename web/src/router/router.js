@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import Vue from 'vue'
 import Router from 'vue-router'
 
@@ -23,13 +22,13 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-    // { path: '/login',
-    //   name: 'login',
-    //   component:() => import('@/views/Login.vue'),
-    //   children: [
-    //
-    //   ],
-    // },
+    { path: '/login',
+      name: 'login',
+      component:() => import('@/views/Login.vue'),
+      children: [
+        
+      ],
+    },
     {
       path: '/',
       name: 'DashBoard',
@@ -55,6 +54,10 @@ export default new Router({
         {
           path: 'RateLimiter',
           component: () => import('@/views/dashboard/manage/RateLimiter.vue')
+        },
+        {
+          path: 'personInfo',
+          component: () => import('@/views/dashboard/personInfo/index.vue')
         },
       ],
     },

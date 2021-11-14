@@ -1,4 +1,4 @@
-/*
+/* 
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import Vue from 'vue'
 import App from '@/App.vue'
 import router from '@/router/router'
 import store from '@/store/store'
 import '@/plugins/element.js'
-import '@/styles/icons/iconfont.css'
+// import '@/styles/icons/iconfont.css'
 import '@/styles/common.scss'
 import '@/styles/normalize.css'
 import '@/permission'
@@ -30,18 +29,18 @@ import '@/element-variables.scss'
 import ElementUI from 'element-ui'
 Vue.config.productionTip = false
 import Router from 'vue-router'
-
+ 
 const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
-    return originalPush.call(this, location).catch(err => err)
+  return originalPush.call(this, location).catch(err => err)
 }
 Vue.use(ElementUI, {
-    size: 'small'
+  size: 'small'
 })
 Vue.mixin(loadding)
 Vue.mixin(updatePublic)
 new Vue({
-    router,
-    store,
-    render: h => h(App)
+  router,
+  store,
+  render: h => h(App)
 }).$mount('#app')

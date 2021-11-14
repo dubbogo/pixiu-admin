@@ -1,18 +1,19 @@
-<!--Licensed to the Apache Software Foundation (ASF) under one or more
-contributor license agreements.  See the NOTICE file distributed with
-this work for additional information regarding copyright ownership.
-The ASF licenses this file to You under the Apache License, Version 2.0
-(the "License"); you may not use this file except in compliance with
-the License.  You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.-->
-
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
 <template>
     <CustomLayout >
     <div class="custom-body">
@@ -25,7 +26,7 @@ limitations under the License.-->
           <el-button type="primary" icon="el-icon-plus" size="mini"
                      @click="handleChange">修改</el-button>
         </div>
-
+        
         <div class="custom-tools__content">
           <el-form :model="form"
                  :inline="true"
@@ -33,7 +34,7 @@ limitations under the License.-->
                  class="table-form bg-gray"
                  label-width="130px">
           <el-row>
-            <div style="clear: 'both'; height: 300px;width: 100%;" id="containForm" ref="containForm"/>
+            <div style="clear: 'both'; height: 100px;width: 100%;" id="containForm" ref="containForm"/>
           </el-row>
         </el-form>
         </div>
@@ -53,14 +54,17 @@ limitations under the License.-->
                   header-row-class-name="custom-table-header"
                   @selection-change="handleSelectionChange"
                   style="width: 100%">
-          <el-table-column
+          <el-table-column 
                            prop="id"
                            label="ID">
           </el-table-column>
-          <el-table-column
+          <el-table-column 
                            class-name="custom-popper--overflow"
                            prop="httpVerb"
                            label="方法">
+            <template slot-scope="scope">
+                <span></span>
+            </template>
           </el-table-column>
           <el-table-column class-name="custom-popper--overflow"
                            label="timeout">
@@ -68,40 +72,18 @@ limitations under the License.-->
                 <span>{{scope.row.timeout}}</span>
             </template>
           </el-table-column>
-          <el-table-column
+          <el-table-column 
                            prop="resourcePath"
                            label="路径">
           </el-table-column>
-
-          <el-table-column prop="requestType" label="inboundRequest.requestType">
-            <template slot-scope="scope">
-                <span>{{scope.row.inboundRequest.requestType}}</span>
-            </template>
+          <el-table-column
+                           prop="type"
+                           label="类型">
           </el-table-column>
-          <el-table-column prop="headers" label="inboundRequest.headers">
-            <template slot-scope="scope">
-                <span>{{scope.row.inboundRequest.headers}}</span>
-            </template>
+          <el-table-column
+                           prop="description"
+                           label="描述">
           </el-table-column>
-          <el-table-column prop="queryStrings" label="inboundRequest.queryStrings">
-            <template slot-scope="scope">
-                <span>{{scope.row.inboundRequest.queryStrings}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="requestBody" label="inboundRequest.requestBody">
-            <template slot-scope="scope">
-                <span>{{scope.row.inboundRequest.requestBody}}</span>
-            </template>
-          </el-table-column>
-
-
-          <!-- <el-table-column
-                           prop="integrationRequest"
-                           label="integrationRequest">
-            <template slot-scope="scope">
-                <span>{{scope.row.integrationRequest}}</span>
-            </template>
-          </el-table-column> -->
           <el-table-column
                            label="操作">
             <template slot-scope="scope">
@@ -116,7 +98,7 @@ limitations under the License.-->
 
         <div class="custom-pagination"
              style="float:right">
-
+          
           <div style="display: flex;">
             <div>
               总共<span>{{ pagination.total }}</span>条记录<i class="custom-pagination__interval"></i>每页显示
@@ -141,7 +123,7 @@ limitations under the License.-->
       </div>
     </div>
             <el-dialog
-                title="新增方法映射"
+                title="新增"
                 :visible.sync="createDialogVisible"
                 width="640px"
                 :before-close="handleClose">
@@ -155,7 +137,7 @@ limitations under the License.-->
         </el-dialog>
 
             <el-dialog
-                title="编辑方法映射"
+                title="查看修改"
                 :visible.sync="updateDialogVisible"
                 width="640px"
                 :before-close="handleClose">
@@ -218,10 +200,10 @@ export default {
       createMonacoEditor: null,
       updateMonacoEditor: null,
       monacoEditored: null,
-      selectedMethodId: null,
     }
   },
   mounted(){
+    console.log(this.$route)
     this.getMethodList()
     this.getResourceDetail()
   },
@@ -296,7 +278,7 @@ export default {
               let data = JSON.parse(res.data)
               console.log(data)
           } else {
-
+            
           }
         })
         .catch((err) => {
@@ -318,7 +300,7 @@ export default {
             this.getMethodList()
             console.log(res)
           } else {
-
+            
           }
         })
         .catch((err) => {
@@ -335,7 +317,7 @@ export default {
              this.tableData = JSON.parse(res.data)
              console.log(this.tableData)
           } else {
-
+            
           }
         })
         .catch((err) => {
@@ -375,8 +357,7 @@ export default {
             })
             this.monacoEditored.dispose()
             this.getResourceDetail()
-            this.getMethodList()
-          }
+          } 
         })
         .catch((err) => {
           console.log(err)
@@ -385,9 +366,8 @@ export default {
     makeCreate() {
       let formData = new FormData();
       let data = this.createMonacoEditor.getValue()
-
       formData.append('content', data);
-
+      
       this.$post('/config/api/resource/method?resourceId=' + this.$route.query.resourceId, formData)
         .then((res) => {
           if (res.code == 10001) {
@@ -395,7 +375,7 @@ export default {
             this.getMethodList()
             console.log(res)
           } else {
-
+            
           }
         })
         .catch((err) => {
@@ -406,17 +386,15 @@ export default {
       let formData = new FormData();
       let data = this.updateMonacoEditor.getValue()
       formData.append('content', data);
-
-      this.$put('/config/api/resource/method?resourceId=' + this.$route.query.resourceId +
-                  "&methodId=" + this.selectedMethodId,
-                  formData)
+      
+      this.$put('/config/api/resource/method?resourceId=' + this.$route.query.resourceId, formData)
         .then((res) => {
           if (res.code == 10001) {
             this.handleClose()
             this.getMethodList()
             console.log(res)
           } else {
-
+            
           }
         })
         .catch((err) => {
@@ -445,12 +423,11 @@ export default {
               let data = res.data
               this.modifyDetailSource = data
               this.updateDialogVisible = true
-              this.selectedMethodId = row.id
               this.$nextTick(() =>[
                 this.initUpdateMoacoEditor('yaml', data)
               ])
           } else {
-
+            
           }
         })
         .catch((err) => {
