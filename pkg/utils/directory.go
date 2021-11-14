@@ -15,25 +15,42 @@
  * limitations under the License.
  */
 
-package controller
+package utils
 
 import (
-	"github.com/dubbogo/pixiu-admin/pkg/config"
+	"os"
 )
 
-const (
-	Version = "0.1.0" // Version admin version
-	OK      = "10001"
-	ERR     = "10002"
-	RETRY   = "10003"
+import (
+	"github.com/dubbogo/pixiu-admin/pkg/global"
+
+	"go.uber.org/zap"
 )
 
-// WithError transform err to RetData
-func WithError(err error) config.RetData {
-	return config.RetData{Code: ERR, Data: err.Error()}
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
-// WithRet transform data to RetData
-func WithRet(data interface{}) config.RetData {
-	return config.RetData{Code: OK, Data: data}
+func CreateDir(dirs ...string) (err error) {
+	for _, v := range dirs {
+		exist, err := PathExists(v)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			global.LOG.Debug("create directory" + v)
+			if err := os.MkdirAll(v, os.ModePerm); err != nil {
+				global.LOG.Error("create directory"+v, zap.Any(" error:", err))
+				return err
+			}
+		}
+	}
+	return err
 }

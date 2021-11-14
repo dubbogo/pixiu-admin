@@ -1,0 +1,35 @@
+# zap logger configuration
+zap:
+  level: 'info'
+  format: 'console'
+  prefix: '[DUBBOGO-PIXIU-ADMIN]'
+  director: 'log'
+  show-line: true
+  encode-level: 'LowercaseColorLevelEncoder'
+  stacktrace-key: 'stacktrace'
+  log-in-console: true
+
+# redis configuration
+redis:
+  db: 0
+  addr: '127.0.0.1:6379'
+  password: ''
+
+
+# system configuration
+system:
+  env: 'public'
+  addr: 8080
+  db-type: 'mysql'
+
+# mysql connect configuration
+mysql:
+  path: ''
+  config: ''
+  db-name: ''
+  username: ''
+  password: ''
+  max-idle-conns: 10
+  max-open-conns: 100
+  log-mode: false
+  log-zap: ""
