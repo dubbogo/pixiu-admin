@@ -26,13 +26,11 @@ import (
 import (
 	"github.com/dgrijalva/jwt-go"
 
+	"github.com/dubbogo/pixiu-admin/pkg/config"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/pkg/errors"
-)
-
-import (
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
 )
 
 // Check token
@@ -40,7 +38,7 @@ func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("token")
 		if token == "" {
-			c.JSON(http.StatusOK, controller.WithError(errors.New("Request does not carry token, no access")))
+			c.JSON(http.StatusOK, config.WithError(errors.New("Request does not carry token, no access")))
 			c.Abort()
 			return
 		}
@@ -51,12 +49,12 @@ func JWTAuth() gin.HandlerFunc {
 		if err != nil {
 			// token authorization expiration
 			if err == TokenExpired {
-				c.JSON(http.StatusOK, controller.WithError(errors.New("The token authorization has expired, please reapply for authorization")))
+				c.JSON(http.StatusOK, config.WithError(errors.New("The token authorization has expired, please reapply for authorization")))
 				c.Abort()
 				return
 			}
 			// Other token error conditions
-			c.JSON(http.StatusOK, controller.WithError(err))
+			c.JSON(http.StatusOK, config.WithError(err))
 		}
 		c.Set("claims", claims)
 	}
