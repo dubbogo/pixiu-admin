@@ -7,7 +7,9 @@ import (
 	"encoding/json"
 	"strings"
 	"text/template"
+)
 
+import (
 	"github.com/swaggo/swag"
 )
 
@@ -31,18 +33,18 @@ var doc = `{
                 "tags": [
                     "Register"
                 ],
-                "summary": "account register",
+                "summary": "用户注册",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "username",
+                        "description": "用户名",
                         "name": "username",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "password",
+                        "description": "密码",
                         "name": "password",
                         "in": "formData",
                         "required": true
@@ -50,7 +52,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"\",\"data\":\"\"}",
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"\"}",
                         "schema": {
                             "type": "string"
                         }

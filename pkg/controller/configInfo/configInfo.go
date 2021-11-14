@@ -22,14 +22,19 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+)
 
+import (
 	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
 	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
+
 	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
 	"github.com/dubbogo/pixiu-admin/pkg/logic"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/pkg/errors"
 )
 
@@ -584,10 +589,9 @@ func BatchReleaseResource(c *gin.Context) {
 }
 
 // BatchReleaseMethod Batch Release Method Config
-//func BatchReleaseMethod(c *gin.Context) {
-//
-//
-//}
+func BatchReleaseMethod(c *gin.Context) {
+	// todo
+}
 
 // BatchReleasePluginGroup Batch Release PluginGroup Config
 func BatchReleasePluginGroup(c *gin.Context) {
