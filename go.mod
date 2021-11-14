@@ -22,4 +22,5 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.0-alpha.0
 	go.uber.org/zap v1.16.0
 	gopkg.in/yaml.v2 v2.4.0
+	gorm.io/gorm v1.22.3
 )
