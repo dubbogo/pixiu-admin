@@ -25,13 +25,22 @@ import (
 import (
 	etcdv3 "github.com/dubbogo/gost/database/kv/etcd/v3"
 
+	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
+	"github.com/dubbogo/pixiu-admin/pkg/logger"
+
 	perrors "github.com/pkg/errors"
 )
 
-import (
-	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
-	"github.com/dubbogo/pixiu-admin/pkg/logger"
-)
+type Server struct {
+	Zap    Zap    `mapstructure:"zap" json:"zap" yaml:"zap"`
+	Redis  Redis  `mapstructure:"redis" json:"redis" yaml:"redis"`
+	System System `mapstructure:"system" json:"system" yaml:"system"`
+
+	AutoCode Autocode `mapstructure:"autoCode" json:"autoCode" yaml:"autoCode"`
+
+	// gorm
+	Mysql Mysql `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
+}
 
 var (
 	Client    *etcdv3.Client
