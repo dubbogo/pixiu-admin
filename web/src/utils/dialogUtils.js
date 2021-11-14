@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {MessageBox} from "element-ui";
 import store from '../store/store'
 import {Loading} from 'element-ui';
