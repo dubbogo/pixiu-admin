@@ -18,8 +18,6 @@
 package main
 
 import (
-	"github.com/dubbogo/pixiu-admin/pkg/controller"
-	"github.com/dubbogo/pixiu-admin/pkg/core"
 	"os"
 	"os/signal"
 	"strconv"
@@ -27,12 +25,11 @@ import (
 )
 
 import (
-	"github.com/spf13/cobra"
-)
-
-import (
 	"github.com/dubbogo/pixiu-admin/pkg/config"
+	"github.com/dubbogo/pixiu-admin/pkg/core"
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
+
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -48,7 +45,7 @@ var (
 			"plugin management, service configuration, API key management, interface authority management \n" +
 			"(appKey authorization, interface authority, online and offline). \n" +
 			"(c) " + strconv.Itoa(time.Now().Year()) + " Dubbogo",
-		Version: controller.Version,
+		Version: config.Version,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			initDefaultValue()
 		},
