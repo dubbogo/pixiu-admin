@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 export const menuList = [{
   name: '网关配置',
   id: 'Gateway',
   children: [{
-    name: '映射配置',
+    name: '概览',
     id: 'Overview',
     componentName: '/Overview'
   }, 

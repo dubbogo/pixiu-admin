@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 const path = require('path');
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
@@ -48,14 +46,24 @@ module.exports = {
         disableHostCheck: true,
         proxy: {
             "/config": {
-                target: "http://127.0.0.1:8080", // 访问数据的计算机域名192.168.9.155:3001
-                // target: "http://122.51.143.73:8080", // 访问数据的计算机域名192.168.9.155:3001
+                // target: "http://127.0.0.1:8081", // 访问数据的计算机域名192.168.9.155:3001
+                target: "http://122.51.143.73:8187", // 访问数据的计算机域名192.168.9.155:3001
                 ws: true, // 是否启用websockets
                 changOrigin: true, //开启代理
                 //将api替换为空
-                // pathRewrite:{
-                //     '^/api':''
-                // },
+                pathRewrite:{
+                    '^/config':''
+                },
+            },
+            "/login": {
+                // target: "http://127.0.0.1:8081", // 访问数据的计算机域名192.168.9.155:3001
+                target: "http://122.51.143.73:8187", // 访问数据的计算机域名192.168.9.155:3001
+                ws: true, // 是否启用websockets
+                changOrigin: true, //开启代理
+                //将api替换为空
+                pathRewrite:{
+                    '^/login':''
+                },
             },
         }
         
