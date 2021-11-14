@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 const plateColorToColorMap = new Map([
 	['0', "蓝色"],
 	['1', "黄色"],

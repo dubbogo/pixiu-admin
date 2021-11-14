@@ -15,12 +15,6 @@
  * limitations under the License.
  */
 
-/*
- * @Author: zhang_weidie
- * @LastEditors: jiangyihong
- * @Date: 2020-09-23 14:59:42
- * @Description: 
- */
 // 获取地址栏url参数并对象化
 export function getLocationSearchObj () {
   var search = location.search.substring(1)

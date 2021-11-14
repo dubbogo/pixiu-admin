@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 const rem=(res)=>{
     let clientWidth = window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
     if (!clientWidth) return;
