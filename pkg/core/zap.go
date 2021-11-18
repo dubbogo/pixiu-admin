@@ -1,15 +1,29 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package core
 
 import (
 	"fmt"
 	"os"
 	"time"
-)
 
-import (
 	"github.com/dubbogo/pixiu-admin/pkg/global"
 	"github.com/dubbogo/pixiu-admin/pkg/utils"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -67,13 +81,14 @@ func getEncoderConfig() (config zapcore.EncoderConfig) {
 		EncodeCaller:   zapcore.FullCallerEncoder,
 	}
 	switch {
-	case global.CONFIG.Zap.EncodeLevel == "LowercaseLevelEncoder": // 小写编码器(默认)
+	case global.CONFIG.Zap.EncodeLevel == "LowercaseLevelEncoder": // lowercase encoder (default)
 		config.EncodeLevel = zapcore.LowercaseLevelEncoder
-	case global.CONFIG.Zap.EncodeLevel == "LowercaseColorLevelEncoder": // 小写编码器带颜色
+	case global.CONFIG.Zap.EncodeLevel == "LowercaseColorLevelEncoder": // lowercase encoder with color
+		// Uppercase encoder
 		config.EncodeLevel = zapcore.LowercaseColorLevelEncoder
-	case global.CONFIG.Zap.EncodeLevel == "CapitalLevelEncoder": // 大写编码器
+	case global.CONFIG.Zap.EncodeLevel == "CapitalLevelEncoder": // uppercase encoder
 		config.EncodeLevel = zapcore.CapitalLevelEncoder
-	case global.CONFIG.Zap.EncodeLevel == "CapitalColorLevelEncoder": // 大写编码器带颜色
+	case global.CONFIG.Zap.EncodeLevel == "CapitalColorLevelEncoder": // uppercase encoder with color
 		config.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	default:
 		config.EncodeLevel = zapcore.LowercaseLevelEncoder
@@ -97,7 +112,7 @@ func getEncoderCore() (core zapcore.Core) {
 	return zapcore.NewCore(getEncoder(), writer, level)
 }
 
-// 自定义日志输出时间格式
+// CustomTimeEncoder custom log output time format
 func CustomTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format(global.CONFIG.Zap.Prefix + "2006/01/02 - 15:04:05.000"))
 }

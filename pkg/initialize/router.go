@@ -12,7 +12,7 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
-// Routers 初始化总路由
+// Routers init router
 func Routers() *gin.Engine {
 	var router = gin.Default()
 

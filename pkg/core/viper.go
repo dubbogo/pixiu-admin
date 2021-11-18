@@ -5,14 +5,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-)
 
-import (
 	"github.com/dubbogo/pixiu-admin/pkg/global"
 	"github.com/dubbogo/pixiu-admin/pkg/utils"
-
 	"github.com/fsnotify/fsnotify"
-
 	"github.com/spf13/viper"
 )
 
@@ -21,7 +17,7 @@ func Viper(path ...string) *viper.Viper {
 	if len(path) == 0 {
 		flag.StringVar(&config, "c", "", "choose config file.")
 		flag.Parse()
-		if config == "" { // 优先级: 命令行 > 环境变量 > 默认值
+		if config == "" {
 			if configEnv := os.Getenv(utils.ConfigEnv); configEnv == "" {
 				config = utils.ConfigFile
 			} else {
