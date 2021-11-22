@@ -1,7 +1,7 @@
 package config
 
 type Mysql struct {
-	Path         string `mapstructure:"path" json:"path" yaml:"path"`
+	Address      string `mapstructure:"address" json:"address" yaml:"address"` // host:port
 	Config       string `mapstructure:"config" json:"config" yaml:"config"`
 	Dbname       string `mapstructure:"db-name" json:"dbname" yaml:"db-name"`
 	Username     string `mapstructure:"username" json:"username" yaml:"username"`
@@ -13,5 +13,5 @@ type Mysql struct {
 }
 
 func (m *Mysql) Dsn() string {
-	return m.Username + ":" + m.Password + "@tcp(" + m.Path + ")/" + m.Dbname + "?" + m.Config
+	return m.Username + ":" + m.Password + "@tcp(" + m.Address + ")/" + m.Dbname + "?" + m.Config
 }

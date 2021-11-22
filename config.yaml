@@ -24,7 +24,7 @@ system:
 
 # mysql connect configuration
 mysql:
-  path: ''
+  address: ''
   config: ''
   db-name: ''
   username: ''
