@@ -28,14 +28,16 @@ import (
 	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
 	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/pkg/errors"
+)
+
+import (
 	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
 	"github.com/dubbogo/pixiu-admin/pkg/logic"
-
-	"github.com/gin-gonic/gin"
-
-	"github.com/pkg/errors"
 )
 
 // GetBaseInfo get pixiu base info such as name,desc

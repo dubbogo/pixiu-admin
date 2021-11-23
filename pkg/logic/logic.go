@@ -30,13 +30,15 @@ import (
 
 	gxetcd "github.com/dubbogo/gost/database/kv/etcd/v3"
 
-	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
-	"github.com/dubbogo/pixiu-admin/pkg/config"
-	"github.com/dubbogo/pixiu-admin/pkg/logger"
-
 	perrors "github.com/pkg/errors"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
+)
+
+import (
+	"github.com/dubbogo/pixiu-admin/pkg/common/yaml"
+	"github.com/dubbogo/pixiu-admin/pkg/config"
+	"github.com/dubbogo/pixiu-admin/pkg/logger"
 )
 
 const (

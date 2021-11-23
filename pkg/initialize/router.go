@@ -1,15 +1,17 @@
 package initialize
 
 import (
-	_ "github.com/dubbogo/pixiu-admin/docs"
-	"github.com/dubbogo/pixiu-admin/pkg/controller/account"
-	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
-	"github.com/dubbogo/pixiu-admin/pkg/controller/configInfo"
-
 	"github.com/gin-gonic/gin"
 
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+)
+
+import (
+	_ "github.com/dubbogo/pixiu-admin/docs"
+	"github.com/dubbogo/pixiu-admin/pkg/controller/account"
+	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
+	"github.com/dubbogo/pixiu-admin/pkg/controller/configInfo"
 )
 
 // Routers init router

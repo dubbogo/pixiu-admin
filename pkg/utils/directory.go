@@ -5,9 +5,11 @@ import (
 )
 
 import (
-	"github.com/dubbogo/pixiu-admin/pkg/global"
-
 	"go.uber.org/zap"
+)
+
+import (
+	"github.com/dubbogo/pixiu-admin/pkg/global"
 )
 
 func PathExists(path string) (bool, error) {

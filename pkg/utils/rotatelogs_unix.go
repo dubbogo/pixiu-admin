@@ -9,11 +9,13 @@ import (
 )
 
 import (
-	"github.com/dubbogo/pixiu-admin/pkg/global"
-
 	zaprotatelogs "github.com/lestrrat-go/file-rotatelogs"
 
 	"go.uber.org/zap/zapcore"
+)
+
+import (
+	"github.com/dubbogo/pixiu-admin/pkg/global"
 )
 
 func GetWriteSyncer() (zapcore.WriteSyncer, error) {

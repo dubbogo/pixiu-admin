@@ -25,11 +25,13 @@ import (
 import (
 	"github.com/dgrijalva/jwt-go"
 
+	"github.com/gin-gonic/gin"
+)
+
+import (
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
-
-	"github.com/gin-gonic/gin"
 )
 
 // Logout user logout

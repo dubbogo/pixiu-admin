@@ -25,11 +25,13 @@ import (
 )
 
 import (
+	"github.com/spf13/cobra"
+)
+
+import (
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/core"
 	"github.com/dubbogo/pixiu-admin/pkg/logger"
-
-	"github.com/spf13/cobra"
 )
 
 var (

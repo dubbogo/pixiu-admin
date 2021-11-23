@@ -26,14 +26,16 @@ import (
 import (
 	"github.com/dgrijalva/jwt-go"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/pkg/errors"
+)
+
+import (
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
 	"github.com/dubbogo/pixiu-admin/pkg/utils"
-
-	"github.com/gin-gonic/gin"
-
-	"github.com/pkg/errors"
 )
 
 // @Tags Register

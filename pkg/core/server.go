@@ -2,11 +2,16 @@ package core
 
 import (
 	"fmt"
+)
 
+import (
+	"go.uber.org/zap"
+)
+
+import (
 	"github.com/dubbogo/pixiu-admin/pkg/config"
 	"github.com/dubbogo/pixiu-admin/pkg/global"
 	"github.com/dubbogo/pixiu-admin/pkg/initialize"
-	"go.uber.org/zap"
 )
 
 type server interface {

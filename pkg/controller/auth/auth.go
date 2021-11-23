@@ -26,11 +26,13 @@ import (
 import (
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/dubbogo/pixiu-admin/pkg/config"
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/pkg/errors"
+)
+
+import (
+	"github.com/dubbogo/pixiu-admin/pkg/config"
 )
 
 // Check token
