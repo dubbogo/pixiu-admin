@@ -29,8 +29,8 @@ import (
 )
 
 import (
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/auth"
+	"github.com/dubbogo/pixiu-admin/pkg/config"
+	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
 )
 
@@ -47,11 +47,11 @@ func Logout(c *gin.Context) {
 	}
 	token, err := j.CreateToken(claims)
 	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 		return
 	}
 	// TODO Optimize the returned json
-	c.JSON(http.StatusOK, controller.WithRet(token))
+	c.JSON(http.StatusOK, config.WithRet(token))
 }
 
 // EditPassword modify account password
@@ -80,10 +80,10 @@ func EditPassword(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, err := account.EditPassword(oldPassword, newPassword, username)
 	if !flag {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 		return
 	}
-	c.JSON(http.StatusOK, controller.WithRet("Successfully modify the password!"))
+	c.JSON(http.StatusOK, config.WithRet("Successfully modify the password!"))
 	// TODO Do I need to update the token?
 	//generateToken(c, username)
 }
@@ -93,10 +93,10 @@ func GetUserInfo(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, userInfo, err := account.GetUserInfo(username)
 	if !flag {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 		return
 	}
-	c.JSON(http.StatusOK, controller.WithRet(userInfo))
+	c.JSON(http.StatusOK, config.WithRet(userInfo))
 }
 
 // GetUserRole get user role
@@ -104,10 +104,10 @@ func GetUserRole(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, result, err := account.GetUserRole(username)
 	if !flag {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 		return
 	}
-	c.JSON(http.StatusOK, controller.WithRet(result))
+	c.JSON(http.StatusOK, config.WithRet(result))
 }
 
 // CheckUserIsAdmin determine whether you are an administrator
@@ -115,8 +115,8 @@ func CheckUserIsAdmin(c *gin.Context) {
 	username := c.Request.Header.Get("username")
 	flag, err := account.CheckUserIsAdmin(username)
 	if !flag {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 		return
 	}
-	c.JSON(http.StatusOK, controller.WithRet("This user is admin"))
+	c.JSON(http.StatusOK, config.WithRet("This user is admin"))
 }

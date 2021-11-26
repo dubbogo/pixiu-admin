@@ -32,12 +32,19 @@ import (
 )
 
 import (
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller"
-	"github.com/dubbogo/pixiu-admin/cmd/admin/controller/auth"
+	"github.com/dubbogo/pixiu-admin/pkg/config"
+	"github.com/dubbogo/pixiu-admin/pkg/controller/auth"
 	"github.com/dubbogo/pixiu-admin/pkg/logic/account"
 	"github.com/dubbogo/pixiu-admin/pkg/utils"
 )
 
+// @Tags Register
+// @Summary 用户注册
+// @Produce  application/json
+// @Param username formData string true "用户名"
+// @Param password formData string true "密码"
+// @Success 200 {string} string "{"code":"","data":""}"
+// @Router /register [post]
 func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
@@ -63,9 +70,9 @@ func Register(c *gin.Context) {
 	password = utils.Md5(password)
 	err := account.Register(username, password)
 	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 	} else {
-		c.JSON(http.StatusOK, controller.WithRet("Register successfully, please login!"))
+		c.JSON(http.StatusOK, config.WithRet("Register successfully, please login!"))
 	}
 }
 
@@ -87,7 +94,7 @@ func Login(c *gin.Context) {
 	if flag {
 		generateToken(c, username)
 	} else {
-		c.JSON(http.StatusOK, controller.WithError(errors.New("Authentication failed, login information is wrong!")))
+		c.JSON(http.StatusOK, config.WithError(errors.New("Authentication failed, login information is wrong!")))
 	}
 }
 
@@ -104,7 +111,7 @@ func generateToken(c *gin.Context, username string) {
 	token, err := j.CreateToken(claims)
 
 	if err != nil {
-		c.JSON(http.StatusOK, controller.WithError(err))
+		c.JSON(http.StatusOK, config.WithError(err))
 		return
 	}
 
@@ -114,5 +121,5 @@ func generateToken(c *gin.Context, username string) {
 		Username: username,
 		Token:    token,
 	}
-	c.JSON(http.StatusOK, controller.WithRet(data))
+	c.JSON(http.StatusOK, config.WithRet(data))
 }
