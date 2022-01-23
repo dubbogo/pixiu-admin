@@ -26,7 +26,7 @@ export default new Router({
       name: 'login',
       component:() => import('@/views/Login.vue'),
       children: [
-        
+
       ],
     },
     {
@@ -50,6 +50,14 @@ export default new Router({
         {
           path: 'Plug',
           component: () => import('@/views/dashboard/manage/Plug.vue')
+        },
+        {
+          path: 'Cluster',
+          component: () => import('@/views/dashboard/manage/Cluster.vue')
+        },
+        {
+          path: 'Listener',
+          component: () => import('@/views/dashboard/manage/Listener.vue')
         },
         {
           path: 'RateLimiter',

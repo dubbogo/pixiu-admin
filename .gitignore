@@ -15,5 +15,7 @@
 # vendor/
 
 .idea
+.vscode
+build.sh
 
 vendor

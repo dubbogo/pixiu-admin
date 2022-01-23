@@ -112,7 +112,7 @@ export default {
       this.keyWord = ''
       this.searchBox = false
       this.searchList = []
-      this.setCurrentMenu(item)
+      // this.setCurrentMenu(item)
       this.handleMenuClick(item)
       this.defaultActive = item.index
       setTimeout(() => {
@@ -121,7 +121,7 @@ export default {
     },
     // 切换页面路由
     switchRouter (item) {
-      this.setCurrentMenu(item)
+      // this.setCurrentMenu(item)
       this.clearPagination()
       this.$router.push({
         path: item.componentName,
@@ -173,7 +173,7 @@ export default {
               path:'/403'
             })
           }
-          
+
         } else {
           this.$router.push({
             path:'/403'
@@ -219,7 +219,7 @@ export default {
     },
   },
   created () {
-    this.initMenu() 
+    this.initMenu()
     this.init()
   }
 }

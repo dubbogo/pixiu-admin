@@ -18,7 +18,7 @@ const path = require('path');
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
-const ThreeExamples = require('import-three-examples')
+// const ThreeExamples = require('import-three-examples')
 function resolve(dir) {
     return path.join(__dirname,'.', dir);
 }
@@ -46,8 +46,8 @@ module.exports = {
         disableHostCheck: true,
         proxy: {
             "/config": {
-                // target: "http://127.0.0.1:8081", // 访问数据的计算机域名192.168.9.155:3001
-                target: "http://122.51.143.73:8187", // 访问数据的计算机域名192.168.9.155:3001
+                target: "http://127.0.0.1:8081", // 访问数据的计算机域名192.168.9.155:3001
+                // target: "http://122.51.143.73:8187", // 访问数据的计算机域名192.168.9.155:3001
                 ws: true, // 是否启用websockets
                 changOrigin: true, //开启代理
                 //将api替换为空
@@ -56,8 +56,8 @@ module.exports = {
                 },
             },
             "/login": {
-                // target: "http://127.0.0.1:8081", // 访问数据的计算机域名192.168.9.155:3001
-                target: "http://122.51.143.73:8187", // 访问数据的计算机域名192.168.9.155:3001
+                target: "http://127.0.0.1:8081", // 访问数据的计算机域名192.168.9.155:3001
+                // target: "http://122.51.143.73:8187", // 访问数据的计算机域名192.168.9.155:3001
                 ws: true, // 是否启用websockets
                 changOrigin: true, //开启代理
                 //将api替换为空
@@ -66,7 +66,7 @@ module.exports = {
                 },
             },
         }
-        
+
     },
     configureWebpack: config => {
         if (process.env.NODE_ENV === 'production') {
@@ -78,7 +78,7 @@ module.exports = {
      // 第三方插件配置
      pluginOptions: {
         // ...
-        ...ThreeExamples
+        // ...ThreeExamples
     },
     // pages: {
     //     login: new PageReset('login', 'pixiu控制台管理系统'),
@@ -103,4 +103,3 @@ module.exports = {
     // 提取出来的通用 chunk 和 vendor chunk。
     this.chunks = ['chunk-vendors', 'chunk-common', name]
   }
-  

@@ -2,10 +2,13 @@ package core
 
 import (
 	"fmt"
+	"net/http"
 )
 
 import (
 	"go.uber.org/zap"
+
+	"v.marlon.life/toolkit/util"
 )
 
 import (
@@ -14,31 +17,48 @@ import (
 	"github.com/dubbogo/pixiu-admin/pkg/initialize"
 )
 
+var (
+	helperInfo = `
+	Welcome DUBBOGO-PIXIU-ADMIN
+	Default doc address: http://127.0.0.1%s/swagger/index.html
+	Default running address: http://127.0.0.1:8080
+`
+)
+
 type server interface {
 	ListenAndServe() error
 }
 
+// RunServer start server
 func RunServer() {
-
+	// load config
 	global.VP = Viper()
-
 	global.LOG = Zap()
 
 	config.InitEtcdClient()
-
 	router := initialize.Routers()
 
 	address := fmt.Sprintf(":%d", global.CONFIG.System.Addr)
 
 	s := initServer(address, router)
 
-	global.LOG.Info("server run success on ", zap.String("address", address))
+	var wg util.WaitGroupWrapper
 
-	fmt.Printf(`
-	Welcome DUBBOGO-PIXIU-ADMIN
-	Default doc address: http://127.0.0.1%s/swagger/index.html
-	Default running address: http://127.0.0.1:8080
-`, address)
+	wg.AddAndRun(func() {
+		global.LOG.Info("server run success on ", zap.String("address", address))
+		fmt.Printf(helperInfo, address)
 
-	global.LOG.Error(s.ListenAndServe().Error())
+		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			global.LOG.Error(err.Error())
+		}
+	})
+
+	wg.AddAndRun(func() {
+		global.LOG.Info("xDS server run success on :18000")
+		if err := StartxDsServer(); err != nil {
+			global.LOG.Error(err.Error())
+		}
+	})
+
+	wg.Wait()
 }

@@ -72,6 +72,7 @@ func (d *GuestDao) Register(username, password string) error {
 	//now := time.Now().Format("2006-01-02 15:04:05")
 	stmt, err := db.Prepare("INSERT INTO pixiu_user (username,password) VALUES (?,?)")
 	if err != nil {
+		panic(err)
 		return errors.New("Illegal SQL statement!")
 	}
 	defer stmt.Close()

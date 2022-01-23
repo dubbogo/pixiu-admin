@@ -26,7 +26,6 @@ import (
 
 import (
 	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
-	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
 
 	"github.com/gin-gonic/gin"
 
@@ -349,192 +348,192 @@ func ModifyMethodInfo(c *gin.Context) {
 }
 
 // GetPluginGroupList get plugin group list
-func GetPluginGroupList(c *gin.Context) {
-	unpublished := getUnpublishedVal(c)
-	res, err := logic.BizGetPluginGroupList(unpublished)
-	if err != nil {
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
-	data, _ := json.Marshal(res)
-	c.JSON(http.StatusOK, config.WithRet(string(data)))
-}
+// func GetPluginGroupList(c *gin.Context) {
+// 	unpublished := getUnpublishedVal(c)
+// 	res, err := logic.BizGetPluginGroupList(unpublished)
+// 	if err != nil {
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
+// 	data, _ := json.Marshal(res)
+// 	c.JSON(http.StatusOK, config.WithRet(string(data)))
+// }
 
-// GetPluginGroupDetail get plugin group detail
-func GetPluginGroupDetail(c *gin.Context) {
-	name := c.Query("name")
-	unpublished := getUnpublishedVal(c)
+// // GetPluginGroupDetail get plugin group detail
+// func GetPluginGroupDetail(c *gin.Context) {
+// 	name := c.Query("name")
+// 	unpublished := getUnpublishedVal(c)
 
-	res, err := logic.BizGetPluginGroupDetail(name, unpublished)
-	if err != nil {
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, config.WithRet(res))
-}
+// 	res, err := logic.BizGetPluginGroupDetail(name, unpublished)
+// 	if err != nil {
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, config.WithRet(res))
+// }
 
-// CreatePluginGroup create plugin group
-func CreatePluginGroup(c *gin.Context) {
-	body := c.PostForm("content")
-	unpublished := getUnpublishedVal(c)
+// // CreatePluginGroup create plugin group
+// func CreatePluginGroup(c *gin.Context) {
+// 	body := c.PostForm("content")
+// 	unpublished := getUnpublishedVal(c)
 
-	res := &fc.PluginsGroup{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
+// 	res := &fc.PluginsGroup{}
+// 	err := yaml.UnmarshalYML([]byte(body), res)
+// 	if err != nil {
+// 		logger.Warnf("read body err, %v\n", err)
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
 
-	var setErr1, setErr2 error // err1 represent write publish space, err2 represent write unpublished space
-	if unpublished {
-		setErr2 = logic.BizSetPluginGroupInfo(res, true, true)
-	} else {
-		setErr1 = logic.BizSetPluginGroupInfo(res, true, false)
-		setErr2 = logic.BizSetPluginGroupInfo(res, true, true)
-	}
+// 	var setErr1, setErr2 error // err1 represent write publish space, err2 represent write unpublished space
+// 	if unpublished {
+// 		setErr2 = logic.BizSetPluginGroupInfo(res, true, true)
+// 	} else {
+// 		setErr1 = logic.BizSetPluginGroupInfo(res, true, false)
+// 		setErr2 = logic.BizSetPluginGroupInfo(res, true, true)
+// 	}
 
-	if setErr1 != nil {
-		c.JSON(http.StatusOK, config.WithError(setErr1))
-		return
-	}
-	if setErr2 != nil {
-		c.JSON(http.StatusOK, config.WithError(setErr2))
-		return
-	}
-	c.JSON(http.StatusOK, config.WithRet("Success"))
-}
+// 	if setErr1 != nil {
+// 		c.JSON(http.StatusOK, config.WithError(setErr1))
+// 		return
+// 	}
+// 	if setErr2 != nil {
+// 		c.JSON(http.StatusOK, config.WithError(setErr2))
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, config.WithRet("Success"))
+// }
 
-// ModifyPluginGroup modify plugin group
-func ModifyPluginGroup(c *gin.Context) {
-	body := c.PostForm("content")
-	unpublished := getUnpublishedVal(c)
+// // ModifyPluginGroup modify plugin group
+// func ModifyPluginGroup(c *gin.Context) {
+// 	body := c.PostForm("content")
+// 	unpublished := getUnpublishedVal(c)
 
-	res := &fc.PluginsGroup{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
+// 	res := &fc.PluginsGroup{}
+// 	err := yaml.UnmarshalYML([]byte(body), res)
+// 	if err != nil {
+// 		logger.Warnf("read body err, %v\n", err)
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
 
-	setErr := logic.BizSetPluginGroupInfo(res, false, unpublished)
-	if setErr != nil {
-		c.JSON(http.StatusOK, config.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, config.WithRet("Success"))
-}
+// 	setErr := logic.BizSetPluginGroupInfo(res, false, unpublished)
+// 	if setErr != nil {
+// 		c.JSON(http.StatusOK, config.WithError(setErr))
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, config.WithRet("Success"))
+// }
 
-// DeletePluginGroup delete plugin group
-func DeletePluginGroup(c *gin.Context) {
-	name := c.Query("name")
-	unpublished := getUnpublishedVal(c)
+// // DeletePluginGroup delete plugin group
+// func DeletePluginGroup(c *gin.Context) {
+// 	name := c.Query("name")
+// 	unpublished := getUnpublishedVal(c)
 
-	if unpublished {
-		old, err := logic.BizGetPluginGroupDetail(name, false)
-		if err != nil {
-			c.JSON(http.StatusOK, config.WithError(err))
-			return
-		}
-		if old != "" {
-			c.JSON(http.StatusOK, config.WithError(errors.New("The configuration has been published and cannot be deleted")))
-			return
-		}
-	}
+// 	if unpublished {
+// 		old, err := logic.BizGetPluginGroupDetail(name, false)
+// 		if err != nil {
+// 			c.JSON(http.StatusOK, config.WithError(err))
+// 			return
+// 		}
+// 		if old != "" {
+// 			c.JSON(http.StatusOK, config.WithError(errors.New("The configuration has been published and cannot be deleted")))
+// 			return
+// 		}
+// 	}
 
-	err := logic.BizDeletePluginGroupInfo(name, unpublished)
-	if err != nil {
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, config.WithRet("Success"))
-}
+// 	err := logic.BizDeletePluginGroupInfo(name, unpublished)
+// 	if err != nil {
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, config.WithRet("Success"))
+// }
 
-// GetPluginRatelimitDetail get plugin ratelimit detail
-func GetPluginRatelimitDetail(c *gin.Context) {
-	unpublished := getUnpublishedVal(c)
-	res, err := logic.BizGetPluginRatelimitConfig(unpublished)
-	if err != nil {
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, config.WithRet(res))
-}
+// // GetPluginRatelimitDetail get plugin ratelimit detail
+// func GetPluginRatelimitDetail(c *gin.Context) {
+// 	unpublished := getUnpublishedVal(c)
+// 	res, err := logic.BizGetPluginRatelimitConfig(unpublished)
+// 	if err != nil {
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, config.WithRet(res))
+// }
 
-// CreatePluginRatelimit create plugin ratelimit config
-func CreatePluginRatelimit(c *gin.Context) {
-	body := c.PostForm("content")
-	unpublished := getUnpublishedVal(c)
+// // CreatePluginRatelimit create plugin ratelimit config
+// func CreatePluginRatelimit(c *gin.Context) {
+// 	body := c.PostForm("content")
+// 	unpublished := getUnpublishedVal(c)
 
-	res := &ratelimit.Config{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
-	var setErr1, setErr2 error // err1 represent write publish space, err2 represent write unpublished space
-	if unpublished {
-		setErr2 = logic.BizSetPluginRatelimitInfo(res, true, true)
-	} else {
-		setErr1 = logic.BizSetPluginRatelimitInfo(res, true, false)
-		setErr2 = logic.BizSetPluginRatelimitInfo(res, true, true)
-	}
+// 	res := &ratelimit.Config{}
+// 	err := yaml.UnmarshalYML([]byte(body), res)
+// 	if err != nil {
+// 		logger.Warnf("read body err, %v\n", err)
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
+// 	var setErr1, setErr2 error // err1 represent write publish space, err2 represent write unpublished space
+// 	if unpublished {
+// 		setErr2 = logic.BizSetPluginRatelimitInfo(res, true, true)
+// 	} else {
+// 		setErr1 = logic.BizSetPluginRatelimitInfo(res, true, false)
+// 		setErr2 = logic.BizSetPluginRatelimitInfo(res, true, true)
+// 	}
 
-	if setErr1 != nil {
-		c.JSON(http.StatusOK, config.WithError(setErr1))
-		return
-	}
-	if setErr2 != nil {
-		c.JSON(http.StatusOK, config.WithError(setErr2))
-		return
-	}
-	c.JSON(http.StatusOK, config.WithRet("Success"))
-}
+// 	if setErr1 != nil {
+// 		c.JSON(http.StatusOK, config.WithError(setErr1))
+// 		return
+// 	}
+// 	if setErr2 != nil {
+// 		c.JSON(http.StatusOK, config.WithError(setErr2))
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, config.WithRet("Success"))
+// }
 
-// ModifyPluginRatelimit create plugin ratelimit config
-func ModifyPluginRatelimit(c *gin.Context) {
-	body := c.PostForm("content")
-	unpublished := getUnpublishedVal(c)
+// // ModifyPluginRatelimit create plugin ratelimit config
+// func ModifyPluginRatelimit(c *gin.Context) {
+// 	body := c.PostForm("content")
+// 	unpublished := getUnpublishedVal(c)
 
-	res := &ratelimit.Config{}
-	err := yaml.UnmarshalYML([]byte(body), res)
-	if err != nil {
-		logger.Warnf("read body err, %v\n", err)
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
+// 	res := &ratelimit.Config{}
+// 	err := yaml.UnmarshalYML([]byte(body), res)
+// 	if err != nil {
+// 		logger.Warnf("read body err, %v\n", err)
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
 
-	setErr := logic.BizSetPluginRatelimitInfo(res, false, unpublished)
-	if setErr != nil {
-		c.JSON(http.StatusOK, config.WithError(setErr))
-		return
-	}
-	c.JSON(http.StatusOK, config.WithRet("Success"))
-}
+// 	setErr := logic.BizSetPluginRatelimitInfo(res, false, unpublished)
+// 	if setErr != nil {
+// 		c.JSON(http.StatusOK, config.WithError(setErr))
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, config.WithRet("Success"))
+// }
 
-// DeletePluginRatelimit delete plugin ratelimit config
-func DeletePluginRatelimit(c *gin.Context) {
-	unpublished := getUnpublishedVal(c)
-	if unpublished {
-		old, err := logic.BizGetPluginRatelimitConfig(false)
-		if err != nil {
-			c.JSON(http.StatusOK, config.WithError(err))
-			return
-		}
-		if old != "" {
-			c.JSON(http.StatusOK, config.WithError(errors.New("The configuration has been published and cannot be deleted")))
-			return
-		}
-	}
-	err := logic.BizDeletePluginRatelimit(unpublished)
-	if err != nil {
-		c.JSON(http.StatusOK, config.WithError(err))
-		return
-	}
-	c.JSON(http.StatusOK, config.WithRet("Success"))
-}
+// // DeletePluginRatelimit delete plugin ratelimit config
+// func DeletePluginRatelimit(c *gin.Context) {
+// 	unpublished := getUnpublishedVal(c)
+// 	if unpublished {
+// 		old, err := logic.BizGetPluginRatelimitConfig(false)
+// 		if err != nil {
+// 			c.JSON(http.StatusOK, config.WithError(err))
+// 			return
+// 		}
+// 		if old != "" {
+// 			c.JSON(http.StatusOK, config.WithError(errors.New("The configuration has been published and cannot be deleted")))
+// 			return
+// 		}
+// 	}
+// 	err := logic.BizDeletePluginRatelimit(unpublished)
+// 	if err != nil {
+// 		c.JSON(http.StatusOK, config.WithError(err))
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, config.WithRet("Success"))
+// }
 
 // getUnpublishedVal Determine the configuration type of the current operation
 func getUnpublishedVal(c *gin.Context) bool {
@@ -623,27 +622,27 @@ func BatchReleasePluginGroup(c *gin.Context) {
 }
 
 // BatchReleasePluginRatelimit Batch Release PluginRatelimit Config
-func BatchReleasePluginRatelimit(c *gin.Context) {
-	_, fromVList, fromErr := logic.BRGetPluginRatelimitList(true) // from represent unpublished space
-	toKList, toVList, _ := logic.BRGetPluginRatelimitList(false)  // to represent published space
-	if fromErr != nil {
-		logger.Warnf("Batch Release PluginRatelimit err, %v\n", fromErr)
-		c.JSON(http.StatusOK, config.WithError(fromErr))
-		return
-	}
-	if toKList == nil {
-		err := logic.BRCreate("", fromVList[0], logic.Ratelimit)
-		if err != nil {
-			logger.Warnf("Batch Release PluginRatelimit err, %v\n", err)
-			c.JSON(http.StatusOK, config.WithError(err))
-		}
-		return
-	}
-	if !strings.EqualFold(fromVList[0], toVList[0]) {
-		err := logic.BRUpdate(toKList[0], fromVList[0])
-		if err != nil {
-			logger.Warnf("Batch Release PluginRatelimit err, %v\n", err)
-			c.JSON(http.StatusOK, config.WithError(err))
-		}
-	}
-}
+// func BatchReleasePluginRatelimit(c *gin.Context) {
+// 	_, fromVList, fromErr := logic.BRGetPluginRatelimitList(true) // from represent unpublished space
+// 	toKList, toVList, _ := logic.BRGetPluginRatelimitList(false)  // to represent published space
+// 	if fromErr != nil {
+// 		logger.Warnf("Batch Release PluginRatelimit err, %v\n", fromErr)
+// 		c.JSON(http.StatusOK, config.WithError(fromErr))
+// 		return
+// 	}
+// 	if toKList == nil {
+// 		err := logic.BRCreate("", fromVList[0], logic.Ratelimit)
+// 		if err != nil {
+// 			logger.Warnf("Batch Release PluginRatelimit err, %v\n", err)
+// 			c.JSON(http.StatusOK, config.WithError(err))
+// 		}
+// 		return
+// 	}
+// 	if !strings.EqualFold(fromVList[0], toVList[0]) {
+// 		err := logic.BRUpdate(toKList[0], fromVList[0])
+// 		if err != nil {
+// 			logger.Warnf("Batch Release PluginRatelimit err, %v\n", err)
+// 			c.JSON(http.StatusOK, config.WithError(err))
+// 		}
+// 	}
+// }
