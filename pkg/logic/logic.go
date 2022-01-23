@@ -185,8 +185,7 @@ func BizSetResourceInfo(res *fc.Resource, created, unpublished bool) error {
 func BizDeleteResourceInfo(id string, unpublished bool) error {
 	key := getResourceKey(id, unpublished)
 	// delete all key with prefix to delete method key
-	config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
-	err := config.Client.Delete(key)
+	_, err := config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
 	if err != nil {
 		logger.Warnf("BizDeleteResourceInfo, %v\n", err)
 		return perrors.WithMessage(err, "BizDeleteResourceInfo error")
@@ -508,8 +507,7 @@ func BizUpdateCluster(res *fc.Cluster) error {
 func BizDeleteCluster(id string) error {
 	key := getClusterKey(id)
 	// delete all key with prefix to delete method key
-	config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
-	err := config.Client.Delete(key)
+	_, err := config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
 	if err != nil {
 		logger.Warnf("BizDeleteCluster, %v\n", err)
 		return perrors.WithMessage(err, "BizDeleteCluster error")
@@ -593,9 +591,8 @@ func BizUpdateListener(res *fc.Listener) error {
 // BizDeleteListener delete Listener
 func BizDeleteListener(name string) error {
 	key := getListenerKey(name)
-	// delete all key with prefix to delete method key
-	config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
-	err := config.Client.Delete(key)
+	// delete all key with prefix to delete listener key
+	_, err := config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
 	if err != nil {
 		logger.Warnf("BizDeleteListener, %v\n", err)
 		return perrors.WithMessage(err, "BizDeleteListener error")

@@ -145,6 +145,6 @@ type OpsLogger interface {
 // SetLoggerLevel ...
 func (dpl *DubbogoPXLogger) SetLoggerLevel(level string) {
 	l := new(zapcore.Level)
-	l.Set(level)
+	_ = l.Set(level)
 	dpl.dynamicLevel.SetLevel(*l)
 }
