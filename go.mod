@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/apache/dubbo-go-pixiu v0.2.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/dubbogo/dubbo-go-pixiu-filter v0.1.4-0.20210613012702-8488bf80772c
+	github.com/dubbogo/dubbo-go-pixiu-filter v0.1.5-0.20220123112635-dbed5fcf7903
 	github.com/dubbogo/gost v1.11.9
 	github.com/envoyproxy/go-control-plane v0.10.1
 	github.com/fsnotify/fsnotify v1.4.9
@@ -28,5 +28,3 @@ require (
 	gorm.io/gorm v1.22.3
 	v.marlon.life/toolkit v0.0.0-20211025131614-e4a91730b4ab
 )
-
-replace github.com/dubbogo/dubbo-go-pixiu-filter => ../dubbo-go-pixiu-filter
