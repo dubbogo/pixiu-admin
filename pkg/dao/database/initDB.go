@@ -33,12 +33,10 @@ var db *sql.DB
 func init() {
 	var err error
 
-	//// Get database properties from configuration file
-	// username, password, host, port, dbname := config.Bootstrap.GetMysqlConfig()
-	// panic(username)
-	// dataSourceName := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?charset=utf8"
-	// db, err = sql.Open(MysqlDriver, dataSourceName)
-	db, err = sql.Open(MysqlDriver, "root:Fw900827@tcp(192.168.31.44:3306)/pixiu")
+	//username, password, host, port, dbname := config.Bootstrap.GetMysqlConfig()
+	//dataSourceName := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?charset=utf8"
+	//db, err = sql.Open(MysqlDriver, dataSourceName)
+	db, err = sql.Open(MysqlDriver, "root:123456@tcp(127.0.0.1:3306)/pixiu")
 	if err != nil {
 		panic(err)
 	}

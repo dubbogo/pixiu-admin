@@ -64,22 +64,10 @@ func Routers() *gin.Engine {
 		taR.PUT("/config/api/resource/method", configInfo.ModifyMethodInfo)
 		taR.DELETE("/config/api/resource/method", configInfo.DeleteMethodInfo)
 
-		// taR.GET("/config/api/plugin_group/list", configInfo.GetPluginGroupList)
-		// taR.GET("/config/api/plugin_group/detail", configInfo.GetPluginGroupDetail)
-		// taR.POST("/config/api/plugin_group", configInfo.CreatePluginGroup)
-		// taR.PUT("/config/api/plugin_group", configInfo.ModifyPluginGroup)
-		// taR.DELETE("/config/api/plugin_group", configInfo.DeletePluginGroup)
-
-		// taR.GET("/config/api/plugin/ratelimit", configInfo.GetPluginRatelimitDetail)
-		// taR.POST("/config/api/plugin/ratelimit", configInfo.CreatePluginRatelimit)
-		// taR.PUT("/config/api/plugin/ratelimit", configInfo.ModifyPluginRatelimit)
-		// taR.DELETE("/config/api/plugin/ratelimit", configInfo.DeletePluginRatelimit)
-
 		// Which request method to choose, Temporarily choose put method
 		taR.PUT("/config/api/resource/publish", configInfo.BatchReleaseResource)
 		taR.PUT("/config/api/resource/method/publish", configInfo.BatchReleaseMethod)
 		taR.PUT("/config/api/plugin_group/publish", configInfo.BatchReleasePluginGroup)
-		// taR.PUT("/config/api/plugin/ratelimit/publish", configInfo.BatchReleasePluginRatelimit)
 	}
 
 	return router

@@ -297,115 +297,6 @@ func BizDeleteMethodInfo(resourceId string, methodId string, unpublished bool) e
 	return nil
 }
 
-// BizGetPluginGroupList get plugin group list
-// func BizGetPluginGroupList(unpublished bool) ([]fc.PluginsGroup, error) {
-// 	key := getPluginGroupPrefixKey(unpublished)
-
-// 	_, vList, err := config.Client.GetChildrenKVList(key)
-// 	if err != nil {
-// 		logger.Errorf("BizGetPluginGroupList err, %v\n", err)
-// 		return nil, perrors.WithMessage(err, "BizGetPluginGroupList error")
-// 	}
-
-// 	var ret []fc.PluginsGroup
-// 	for _, v := range vList {
-// 		res := &fc.PluginsGroup{}
-// 		err := yaml.UnmarshalYML([]byte(v), res)
-// 		if err != nil {
-// 			logger.Errorf("UnmarshalYML err, %v\n", err)
-// 		}
-// 		ret = append(ret, *res)
-// 	}
-
-// 	return ret, nil
-// }
-
-// BizGetPluginGroupDetail get plugin group detail
-// func BizGetPluginGroupDetail(name string, unpublished bool) (string, error) {
-// 	key := getPluginGroupKey(name, unpublished)
-// 	detail, err := config.Client.Get(key)
-// 	if err != nil {
-// 		logger.Errorf("BizGetPluginGroupDetail err, %v\n", err)
-// 		return "", perrors.WithMessage(err, "BizGetPluginGroupDetail error")
-// 	}
-// 	return detail, nil
-// }
-
-// BizSetPluginGroupInfo create or update plugin group
-// func BizSetPluginGroupInfo(res *fc.PluginsGroup, created, unpublished bool) error {
-
-// 	data, _ := yaml.MarshalYML(res)
-// 	if created {
-// 		setErr := config.Client.Create(getPluginGroupKey(res.GroupName, unpublished), string(data))
-// 		if setErr != nil {
-// 			logger.Warnf("create etcd error, %v\n", setErr)
-// 			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
-// 		}
-// 	} else {
-// 		setErr := config.Client.Update(getPluginGroupKey(res.GroupName, unpublished), string(data))
-// 		if setErr != nil {
-// 			logger.Warnf("update etcd error, %v\n", setErr)
-// 			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
-// 		}
-// 	}
-
-// 	return nil
-// }
-
-// BizDeletePluginGroupInfo delete plugin group
-// func BizDeletePluginGroupInfo(name string, unpublished bool) error {
-// 	key := getPluginGroupKey(name, unpublished)
-// 	err := config.Client.Delete(key)
-// 	if err != nil {
-// 		logger.Warnf("BizDeletePluginGroupInfo, %v\n", err)
-// 		return perrors.WithMessage(err, "BizDeletePluginGroupInfo error")
-// 	}
-// 	return nil
-// }
-
-// // BizGetPluginGroupDetail get plugin group detail
-// func BizGetPluginRatelimitConfig(unpublished bool) (string, error) {
-// 	key := getPluginRatelimitKey(unpublished)
-// 	detail, err := config.Client.Get(key)
-// 	if err != nil {
-// 		logger.Errorf("BizGetPluginRatelimitConfig err, %v\n", err)
-// 		return "", perrors.WithMessage(err, "BizGetPluginRatelimitConfig error")
-// 	}
-// 	return detail, nil
-// }
-
-// // BizSetPluginGroupInfo create or update plugin group
-// func BizSetPluginRatelimitInfo(res *ratelimit.Config, created bool, unpublished bool) error {
-
-// 	data, _ := yaml.MarshalYML(res)
-// 	if created {
-// 		setErr := config.Client.Create(getPluginRatelimitKey(unpublished), string(data))
-// 		if setErr != nil {
-// 			logger.Warnf("create etcd error, %v\n", setErr)
-// 			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
-// 		}
-// 	} else {
-// 		setErr := config.Client.Update(getPluginRatelimitKey(unpublished), string(data))
-// 		if setErr != nil {
-// 			logger.Warnf("update etcd error, %v\n", setErr)
-// 			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
-// 		}
-// 	}
-
-// 	return nil
-// }
-
-// // BizDeletePluginRatelimit delete plugin ratelimit config
-// func BizDeletePluginRatelimit(unpublished bool) error {
-// 	key := getPluginRatelimitKey(unpublished)
-// 	err := config.Client.Delete(key)
-// 	if err != nil {
-// 		logger.Warnf("BizDeletePluginRatelimit, %v\n", err)
-// 		return perrors.WithMessage(err, "BizDeletePluginRatelimit error")
-// 	}
-// 	return nil
-// }
-
 // BRGetResourceList GetResourceList
 func BRGetResourceList(unpublished bool) ([]string, []string, error) {
 	if unpublished {
@@ -426,15 +317,6 @@ func BRGetPluginGroupList(unpublished bool) ([]string, []string, error) {
 	key := getPluginGroupPrefixKey(unpublished)
 	return config.Client.GetChildrenKVList(key)
 }
-
-// BRGetPluginRatelimitList GetPluginRatelimitList
-// func BRGetPluginRatelimitList(unpublished bool) ([]string, []string, error) {
-// 	if unpublished {
-// 		return config.Client.GetChildrenKVList(getUnpublishedRootPath(Ratelimit))
-// 	} else {
-// 		return config.Client.GetChildrenKVList(getRootPath(Ratelimit))
-// 	}
-// }
 
 // BizGetClusters get clusters
 func BizGetClusters() ([]fc.Cluster, error) {

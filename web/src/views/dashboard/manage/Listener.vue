@@ -214,22 +214,21 @@ export default {
         path: "",
       },
       pagination: {
-        // 分页字段
-        pageIndex: 1, // 当前页
-        pageSize: 20, // 每页显示多少条
-        total: 0, // 总条数
+        pageIndex: 1,
+        pageSize: 20,
+        total: 0,
         pageSizes: [20, 50, 100],
       },
-      tableData: [], // table列表数据
+      tableData: [],
       loading: false,
-      tableHeight: window.document.documentElement.clientHeight - 248, // table高度
-      multipleSelection: [], // 多选时，已选项
-      currentRow: {}, // 当前选中行
-      areaDialogVisible: false, // 是否显示行政区划弹窗
-      emptText: "暂无数据", // table数据为空的提示语
-      isSizeInit: false, // 是否是页面初始化时设置的PageSize
-      previewDialogVisible: false, // 是否显示行政区划弹窗
-      currentTemplate: {}, //当前选中的模板
+      tableHeight: window.document.documentElement.clientHeight - 248,
+      multipleSelection: [],
+      currentRow: {},
+      areaDialogVisible: false,
+      emptText: "暂无数据",
+      isSizeInit: false,
+      previewDialogVisible: false,
+      currentTemplate: {},
       updateDetailSource: null,
       createDetailSource: null,
       createMonacoEditor: null,

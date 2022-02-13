@@ -22,11 +22,6 @@ export const menuList = [{
     id: 'Overview',
     componentName: '/Overview'
   },
-  // {
-  //   name: '映射配置',
-  //   id: 'Mapping',
-  //   componentName: '/Mapping'
-  // },
   {
     name: '插件配置',
     id: 'Plug',
