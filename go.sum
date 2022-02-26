@@ -188,6 +188,8 @@ github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815/go.mod h1:WwZ+bS3
 github.com/dubbogo/dubbo-go-pixiu-filter v0.1.4/go.mod h1:d6SDK5BHl/QCvg84BN+g6LZS9QzVqnI2+yw0NBu0uac=
 github.com/dubbogo/dubbo-go-pixiu-filter v0.1.5-0.20220123112635-dbed5fcf7903 h1:V0dVpcIlJmfqUDzrCNitpWW8w+kAygNbBF+ta+S2VX4=
 github.com/dubbogo/dubbo-go-pixiu-filter v0.1.5-0.20220123112635-dbed5fcf7903/go.mod h1:sZSi0hyl9rquVwHZQxNa8ARs85/gQAwzjYgbxFLP4yY=
+github.com/dubbogo/dubbo-go-pixiu-filter v0.1.5 h1:qwzUNqWdLjE3+in49/Ny1Vjfzrztzd3JcxdUenDe610=
+github.com/dubbogo/dubbo-go-pixiu-filter v0.1.5/go.mod h1:sZSi0hyl9rquVwHZQxNa8ARs85/gQAwzjYgbxFLP4yY=
 github.com/dubbogo/go-zookeeper v1.0.3/go.mod h1:fn6n2CAEer3novYgk9ULLwAjuV8/g4DdC2ENwRb6E+c=
 github.com/dubbogo/go-zookeeper v1.0.4-0.20211212162352-f9d2183d89d5/go.mod h1:fn6n2CAEer3novYgk9ULLwAjuV8/g4DdC2ENwRb6E+c=
 github.com/dubbogo/gost v1.9.0/go.mod h1:pPTjVyoJan3aPxBPNUX0ADkXjPibLo+/Ib0/fADXSG8=

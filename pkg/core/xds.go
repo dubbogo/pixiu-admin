@@ -225,6 +225,10 @@ func makeListeners() *pixiupb.PixiuExtensionListeners {
 		return nil
 	}
 
+	if len(listeners) == 0 {
+		return nil
+	}
+
 	pbListeners := &pixiupb.PixiuExtensionListeners{}
 	for _, listener := range listeners {
 		pbListeners.Listeners = append(pbListeners.Listeners, &pixiupb.Listener{
@@ -246,6 +250,10 @@ func makeClusters() *pixiupb.PixiuExtensionClusters {
 	clusters, err := logic.BizGetClusters()
 	if err != nil {
 		logger.Errorf("get clusters error %q", err)
+		return nil
+	}
+
+	if len(clusters) == 0 {
 		return nil
 	}
 

@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/apache/dubbo-go-pixiu v0.0.0-20220214050020-3f4672f272f1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/dubbogo/dubbo-go-pixiu-filter v0.1.5-0.20220123112635-dbed5fcf7903
+	github.com/dubbogo/dubbo-go-pixiu-filter v0.1.5
 	github.com/dubbogo/gost v1.11.22
 	github.com/envoyproxy/go-control-plane v0.10.1
 	github.com/fsnotify/fsnotify v1.5.1
