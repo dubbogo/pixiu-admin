@@ -1,6 +1,6 @@
 module github.com/dubbogo/pixiu-admin
 
-go 1.14
+go 1.15
 
 require (
 	github.com/apache/dubbo-go-pixiu v0.0.0-20220214050020-3f4672f272f1
