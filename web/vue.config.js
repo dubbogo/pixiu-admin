@@ -18,7 +18,7 @@ const path = require('path');
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
-const ThreeExamples = require('import-three-examples')
+// const ThreeExamples = require('import-three-examples')
 function resolve(dir) {
     return path.join(__dirname,'.', dir);
 }
@@ -46,27 +46,25 @@ module.exports = {
         disableHostCheck: true,
         proxy: {
             "/config": {
-                // target: "http://127.0.0.1:8081", // 访问数据的计算机域名192.168.9.155:3001
-                target: "http://122.51.143.73:8187", // 访问数据的计算机域名192.168.9.155:3001
-                ws: true, // 是否启用websockets
-                changOrigin: true, //开启代理
-                //将api替换为空
+                target: "http://127.0.0.1:8081",
+                ws: true, // enable websocket proxy
+                changOrigin: true, // enable proxy module
+                // proxy url replace rules
                 pathRewrite:{
                     '^/config':''
                 },
             },
             "/login": {
-                // target: "http://127.0.0.1:8081", // 访问数据的计算机域名192.168.9.155:3001
-                target: "http://122.51.143.73:8187", // 访问数据的计算机域名192.168.9.155:3001
-                ws: true, // 是否启用websockets
-                changOrigin: true, //开启代理
-                //将api替换为空
+                target: "http://127.0.0.1:8081",
+                ws: true, // enable websocket proxy
+                changOrigin: true, // enable proxy module
+                // proxy url replace rules
                 pathRewrite:{
                     '^/login':''
                 },
             },
         }
-        
+
     },
     configureWebpack: config => {
         if (process.env.NODE_ENV === 'production') {
@@ -75,32 +73,24 @@ module.exports = {
             }
         }
     },
-     // 第三方插件配置
+     // other vue-cli plugin things...
      pluginOptions: {
         // ...
-        ...ThreeExamples
+        // ...ThreeExamples
     },
-    // pages: {
-    //     login: new PageReset('login', 'pixiu控制台管理系统'),
-    // }
 }
 /**
- * 页面构造器
- * @param {String} name 页面名称
- * @param {String} title 页面title
+ * page generator
+ * @param {String} name page name
+ * @param {String} title page title
  */
  function PageReset (name, title) {
-    // page 的入口
+    // main.js
     this.entry = `src/entry/${name}.js`
-    // 模板来源
+    // template source path
     this.template = 'public/index.html'
-    // 在 dist/index.html 的输出
+    // output filename
     this.filename = `${name}.html`
-    // 当使用 title 选项时，
-    // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
     this.title = title
-    // 在这个页面中包含的块，默认情况下会包含
-    // 提取出来的通用 chunk 和 vendor chunk。
     this.chunks = ['chunk-vendors', 'chunk-common', name]
   }
-  

@@ -61,12 +61,12 @@ export default {
   name: 'CustomMenu',
   data () {
     return {
-      defaultActive: '', // 激活菜单项index值
-      menuList: menuList, // 菜单列表
-      searchList: [], // 搜索到的菜单列表(子菜单)
-      keyWord: '', // 搜索关键字
-      searchBox: false, // 搜索内容区域，显示隐藏
-      fromType: true, // true:显示原有内容， false:隐藏部分内容 是否嵌入到其他项目中，需要对应隐藏部分内容(菜单，header)
+      defaultActive: '', // active menu
+      menuList: menuList, // menu list
+      searchList: [], // search list
+      keyWord: '', // keyword
+      searchBox: false, // search area
+      fromType: true, // true: 显示原有内容， false:隐藏部分内容 是否嵌入到其他项目中，需要对应隐藏部分内容(菜单，header)
     }
   },
   watch: {
@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     ...mapMutations(['setOrgId', 'setCurrentMenu']),
-    // 清除分页信息
+    // clear page cache
     clearPagination () {
       clearLocalStorage('picTxtIdx')
       clearLocalStorage('picTxtSize')
@@ -98,7 +98,6 @@ export default {
         console.log(err)
       })
     }, 200),
-    // 点击搜索后的菜单，滚动定位到已选项
     handleScrollPosition () {
       let el = document.querySelector('.custom-menu-container')
       let top = el.scrollTop
@@ -107,21 +106,17 @@ export default {
       top = top + y - 60 - 56
       el.scrollTop = top
     },
-    // 搜索菜单项点击
     handleSearchMenuClick (item) {
       this.keyWord = ''
       this.searchBox = false
       this.searchList = []
-      this.setCurrentMenu(item)
       this.handleMenuClick(item)
       this.defaultActive = item.index
       setTimeout(() => {
         this.handleScrollPosition()
       }, 300)
     },
-    // 切换页面路由
     switchRouter (item) {
-      this.setCurrentMenu(item)
       this.clearPagination()
       this.$router.push({
         path: item.componentName,
@@ -134,23 +129,23 @@ export default {
         el.scrollTop = 0
       }
     },
-    // 点击菜单项
     handleMenuClick (item) {
       this.switchRouter(item)
     },
-    // 菜单栏展开
     handleOpen(key, keyPath) {
       // console.log(key, keyPath)
     },
-    // 菜单栏收起
     handleClose(key, keyPath) {
       // console.log(key, keyPath)
     },
-    // 初始化菜单列表
     initMenu () {
-      // 0:默认框架页内加载(左侧菜单栏也需要对应)，1外部工具打开(第三方应用程序)，
-      // 2新窗口打开，3覆盖本窗口打开, 4云听后台的内容嵌入，(需要先登录,暂已改成默认管理员登录)
-      // 5 提示暂未开通 6应用中路由跳转
+      // 0: default load method
+      // 1: external tool open
+      // 2: new window open
+      // 3: cover current window open
+      // 4: cloud listen backend content embed
+      // 5: notice not open
+      // 6: application router jump
       console.log(this.menuList)
       let findShow = this.menuList.find(item => item.children.length>0)
       if(findShow){
@@ -173,7 +168,7 @@ export default {
               path:'/403'
             })
           }
-          
+
         } else {
           this.$router.push({
             path:'/403'
@@ -184,10 +179,10 @@ export default {
         console.log(err)
       })
     },
-    // 设置激活的菜单项
+    // special active menu
     initDefaultActive () {
       let index, current
-      // 如果设置了激活某一项，则优先激活显示某个路由
+      // if set active menu, then show active menu
       let params = getLocationSearchObj()
       if (params.menuId !== undefined) {
         let list = this.menuList
@@ -198,7 +193,7 @@ export default {
         current = list.find(item => item.id == params.menuId)
         index = current.id
       } else {
-        // 使用第一个菜单项，如果有子菜单，则用子菜单的第一激活
+        // using the first menu item, if there is a submenu, then use the first active
         for (let i = 0; i < this.menuList.length; i++) {
           let item = this.menuList[i]
           if (item.children && item.children.length > 0) {
@@ -215,11 +210,11 @@ export default {
     },
     init() {
       let params = getLocationSearchObj()
-      this.fromType = params.from == 1 ? false : true // 判断是否隐藏左侧菜单 true是不隐藏 false的隐藏
+      this.fromType = params.from == 1 ? false : true // hide header and menu on formType = 1
     },
   },
   created () {
-    this.initMenu() 
+    this.initMenu()
     this.init()
   }
 }

@@ -57,6 +57,8 @@ func JWTAuth() gin.HandlerFunc {
 			}
 			// Other token error conditions
 			c.JSON(http.StatusOK, config.WithError(err))
+			c.Abort()
+			return
 		}
 		c.Set("claims", claims)
 	}

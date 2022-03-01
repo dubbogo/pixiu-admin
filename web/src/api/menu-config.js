@@ -21,16 +21,19 @@ export const menuList = [{
     name: '概览',
     id: 'Overview',
     componentName: '/Overview'
-  }, 
-  // {
-  //   name: '映射配置',
-  //   id: 'Mapping',
-  //   componentName: '/Mapping'
-  // }, 
+  },
   {
     name: '插件配置',
     id: 'Plug',
     componentName: 'Plug'
+  },{
+    name: '集群管理',
+    id: 'Cluster',
+    componentName: 'Cluster'
+  },{
+    name: 'Listener管理',
+    id: 'Listener',
+    componentName: 'Listener'
   }]
 }, {
   name: '限流配置',

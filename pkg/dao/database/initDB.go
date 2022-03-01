@@ -33,7 +33,6 @@ var db *sql.DB
 func init() {
 	var err error
 
-	//// Get database properties from configuration file
 	//username, password, host, port, dbname := config.Bootstrap.GetMysqlConfig()
 	//dataSourceName := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?charset=utf8"
 	//db, err = sql.Open(MysqlDriver, dataSourceName)

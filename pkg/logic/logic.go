@@ -26,7 +26,6 @@ import (
 
 import (
 	fc "github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config"
-	"github.com/dubbogo/dubbo-go-pixiu-filter/pkg/api/config/ratelimit"
 
 	gxetcd "github.com/dubbogo/gost/database/kv/etcd/v3"
 
@@ -46,11 +45,15 @@ const (
 	Resources   = "resources"
 	Method      = "method"
 	ResourceID  = "resourceId"
+	ClusterID   = "clusterId"
+	Listener    = "listener"
 	MethodID    = "methodId"
 	PluginGroup = "pluginGroup"
 	Plugin      = "plugin"
 	Filter      = "filter"
 	Ratelimit   = "ratelimit"
+	Clusters    = "clusters"
+	Listeners   = "listeners"
 	Unpublished = "unpublished"
 
 	ErrID = -1
@@ -182,8 +185,7 @@ func BizSetResourceInfo(res *fc.Resource, created, unpublished bool) error {
 func BizDeleteResourceInfo(id string, unpublished bool) error {
 	key := getResourceKey(id, unpublished)
 	// delete all key with prefix to delete method key
-	config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
-	err := config.Client.Delete(key)
+	_, err := config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
 	if err != nil {
 		logger.Warnf("BizDeleteResourceInfo, %v\n", err)
 		return perrors.WithMessage(err, "BizDeleteResourceInfo error")
@@ -295,115 +297,6 @@ func BizDeleteMethodInfo(resourceId string, methodId string, unpublished bool) e
 	return nil
 }
 
-// BizGetPluginGroupList get plugin group list
-func BizGetPluginGroupList(unpublished bool) ([]fc.PluginsGroup, error) {
-	key := getPluginGroupPrefixKey(unpublished)
-
-	_, vList, err := config.Client.GetChildrenKVList(key)
-	if err != nil {
-		logger.Errorf("BizGetPluginGroupList err, %v\n", err)
-		return nil, perrors.WithMessage(err, "BizGetPluginGroupList error")
-	}
-
-	var ret []fc.PluginsGroup
-	for _, v := range vList {
-		res := &fc.PluginsGroup{}
-		err := yaml.UnmarshalYML([]byte(v), res)
-		if err != nil {
-			logger.Errorf("UnmarshalYML err, %v\n", err)
-		}
-		ret = append(ret, *res)
-	}
-
-	return ret, nil
-}
-
-// BizGetPluginGroupDetail get plugin group detail
-func BizGetPluginGroupDetail(name string, unpublished bool) (string, error) {
-	key := getPluginGroupKey(name, unpublished)
-	detail, err := config.Client.Get(key)
-	if err != nil {
-		logger.Errorf("BizGetPluginGroupDetail err, %v\n", err)
-		return "", perrors.WithMessage(err, "BizGetPluginGroupDetail error")
-	}
-	return detail, nil
-}
-
-// BizSetPluginGroupInfo create or update plugin group
-func BizSetPluginGroupInfo(res *fc.PluginsGroup, created, unpublished bool) error {
-
-	data, _ := yaml.MarshalYML(res)
-	if created {
-		setErr := config.Client.Create(getPluginGroupKey(res.GroupName, unpublished), string(data))
-		if setErr != nil {
-			logger.Warnf("create etcd error, %v\n", setErr)
-			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
-		}
-	} else {
-		setErr := config.Client.Update(getPluginGroupKey(res.GroupName, unpublished), string(data))
-		if setErr != nil {
-			logger.Warnf("update etcd error, %v\n", setErr)
-			return perrors.WithMessage(setErr, "BizSetPluginGroupInfo error")
-		}
-	}
-
-	return nil
-}
-
-// BizDeletePluginGroupInfo delete plugin group
-func BizDeletePluginGroupInfo(name string, unpublished bool) error {
-	key := getPluginGroupKey(name, unpublished)
-	err := config.Client.Delete(key)
-	if err != nil {
-		logger.Warnf("BizDeletePluginGroupInfo, %v\n", err)
-		return perrors.WithMessage(err, "BizDeletePluginGroupInfo error")
-	}
-	return nil
-}
-
-// BizGetPluginGroupDetail get plugin group detail
-func BizGetPluginRatelimitConfig(unpublished bool) (string, error) {
-	key := getPluginRatelimitKey(unpublished)
-	detail, err := config.Client.Get(key)
-	if err != nil {
-		logger.Errorf("BizGetPluginRatelimitConfig err, %v\n", err)
-		return "", perrors.WithMessage(err, "BizGetPluginRatelimitConfig error")
-	}
-	return detail, nil
-}
-
-// BizSetPluginGroupInfo create or update plugin group
-func BizSetPluginRatelimitInfo(res *ratelimit.Config, created bool, unpublished bool) error {
-
-	data, _ := yaml.MarshalYML(res)
-	if created {
-		setErr := config.Client.Create(getPluginRatelimitKey(unpublished), string(data))
-		if setErr != nil {
-			logger.Warnf("create etcd error, %v\n", setErr)
-			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
-		}
-	} else {
-		setErr := config.Client.Update(getPluginRatelimitKey(unpublished), string(data))
-		if setErr != nil {
-			logger.Warnf("update etcd error, %v\n", setErr)
-			return perrors.WithMessage(setErr, "BizSetPluginRatelimitInfo error")
-		}
-	}
-
-	return nil
-}
-
-// BizDeletePluginRatelimit delete plugin ratelimit config
-func BizDeletePluginRatelimit(unpublished bool) error {
-	key := getPluginRatelimitKey(unpublished)
-	err := config.Client.Delete(key)
-	if err != nil {
-		logger.Warnf("BizDeletePluginRatelimit, %v\n", err)
-		return perrors.WithMessage(err, "BizDeletePluginRatelimit error")
-	}
-	return nil
-}
-
 // BRGetResourceList GetResourceList
 func BRGetResourceList(unpublished bool) ([]string, []string, error) {
 	if unpublished {
@@ -425,13 +318,179 @@ func BRGetPluginGroupList(unpublished bool) ([]string, []string, error) {
 	return config.Client.GetChildrenKVList(key)
 }
 
-// BRGetPluginRatelimitList GetPluginRatelimitList
-func BRGetPluginRatelimitList(unpublished bool) ([]string, []string, error) {
-	if unpublished {
-		return config.Client.GetChildrenKVList(getUnpublishedRootPath(Ratelimit))
-	} else {
-		return config.Client.GetChildrenKVList(getRootPath(Ratelimit))
+// BizGetClusters get clusters
+func BizGetClusters() ([]fc.Cluster, error) {
+	var (
+		kList, vList []string
+		err          error
+	)
+	kList, vList, err = config.Client.GetChildrenKVList(getRootPath(Clusters))
+	if err != nil {
+		logger.Debugf("get clusters error from etcd, %+v, %+v, %s", kList, vList, err)
+		return nil, perrors.WithMessage(err, "get clusters error")
 	}
+
+	var ret []fc.Cluster
+
+	for i, k := range kList {
+		// only handle resource, filter method
+		re := getCheckClusterRegexp()
+		if m := re.Match([]byte(k)); !m {
+			continue
+		}
+		v := vList[i]
+		res := &fc.Cluster{}
+		err := yaml.UnmarshalYML([]byte(v), res)
+		if err != nil {
+			logger.Errorf("UnmarshalYML err, %v\n", err)
+		}
+		ret = append(ret, *res)
+	}
+
+	return ret, nil
+}
+
+// BizCreateCluster create cluster
+func BizCreateCluster(res *fc.Cluster) error {
+	res.ID = getClusterId()
+	if res.ID == ErrID {
+		logger.Warnf("can't get id from etcd")
+		return perrors.New("BizSetCluster error can't get id from etcd")
+	}
+	data, _ := yaml.MarshalYML(res)
+	setErr := config.Client.Create(getClusterKey(strconv.Itoa(res.ID)), string(data))
+
+	if setErr != nil {
+		logger.Warnf("Create etcd error, %v\n", setErr)
+		return perrors.WithMessage(setErr, "BizSetCluster error")
+	}
+
+	return nil
+}
+
+// BizUpdateCluster create cluster
+func BizUpdateCluster(res *fc.Cluster) error {
+	if res.ID <= 0 {
+		logger.Warnf("invalid cluster id, %d", res.ID)
+		return perrors.New("invalid cluster id")
+	}
+	data, _ := yaml.MarshalYML(res)
+	setErr := config.Client.Update(getClusterKey(strconv.Itoa(res.ID)), string(data))
+
+	if setErr != nil {
+		logger.Warnf("Update etcd error, %v\n", setErr)
+		return perrors.WithMessage(setErr, "BizSetCluster error")
+	}
+
+	return nil
+}
+
+// BizDeleteCluster delete cluster
+func BizDeleteCluster(id string) error {
+	key := getClusterKey(id)
+	// delete all key with prefix to delete method key
+	_, err := config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
+	if err != nil {
+		logger.Warnf("BizDeleteCluster, %v\n", err)
+		return perrors.WithMessage(err, "BizDeleteCluster error")
+	}
+	return nil
+}
+
+// BizGetCluster get cluster
+func BizGetCluster(id string) (string, error) {
+	key := getClusterKey(id)
+	detail, err := config.Client.Get(key)
+	if err != nil {
+		logger.Errorf("BizGetClusterDetail error, %v\n", err)
+		return "", perrors.WithMessage(err, "BizGetClusterDetail error")
+	}
+	return detail, nil
+}
+
+// BizGetListeners get Listeners
+func BizGetListeners() ([]fc.Listener, error) {
+	kList, vList, err := config.Client.GetChildrenKVList(getRootPath(Listeners))
+	if err != nil {
+		logger.Debugf("get listeners error from etcd, %+v, %+v, %s", kList, vList, err)
+		return nil, perrors.WithMessage(err, "get listeners error")
+	}
+
+	var ret []fc.Listener
+
+	for i, k := range kList {
+		// only handle resource, filter method
+		re := getCheckListenerRegexp()
+		if m := re.Match([]byte(k)); !m {
+			continue
+		}
+		v := vList[i]
+		res := &fc.Listener{}
+		err := yaml.UnmarshalYML([]byte(v), res)
+		if err != nil {
+			logger.Errorf("UnmarshalYML err, %v\n", err)
+		}
+		ret = append(ret, *res)
+	}
+
+	return ret, nil
+}
+
+// BizCreateListener create Listener
+func BizCreateListener(res *fc.Listener) error {
+	if strings.TrimSpace(res.Name) == "" {
+		logger.Warnf("invalid listener name, %s", res.Name)
+		return perrors.New("invalid listener id")
+	}
+	data, _ := yaml.MarshalYML(res)
+	setErr := config.Client.Create(getListenerKey(res.Name), string(data))
+
+	if setErr != nil {
+		logger.Warnf("Create etcd error, %v\n", setErr)
+		return perrors.WithMessage(setErr, "BizSetCluster error")
+	}
+
+	return nil
+}
+
+// BizUpdateListener create Listener
+func BizUpdateListener(res *fc.Listener) error {
+	if strings.TrimSpace(res.Name) == "" {
+		logger.Warnf("invalid listener name, %s", res.Name)
+		return perrors.New("invalid listener name")
+	}
+	data, _ := yaml.MarshalYML(res)
+	setErr := config.Client.Update(getListenerKey(res.Name), string(data))
+
+	if setErr != nil {
+		logger.Warnf("Update etcd error, %v\n", setErr)
+		return perrors.WithMessage(setErr, "BizSetListener error")
+	}
+
+	return nil
+}
+
+// BizDeleteListener delete Listener
+func BizDeleteListener(name string) error {
+	key := getListenerKey(name)
+	// delete all key with prefix to delete listener key
+	_, err := config.Client.GetRawClient().Delete(config.Client.GetCtx(), key, clientv3.WithPrefix())
+	if err != nil {
+		logger.Warnf("BizDeleteListener, %v\n", err)
+		return perrors.WithMessage(err, "BizDeleteListener error")
+	}
+	return nil
+}
+
+// BizGetListener get Listener
+func BizGetListener(name string) (string, error) {
+	key := getListenerKey(name)
+	detail, err := config.Client.Get(key)
+	if err != nil {
+		logger.Errorf("BizGetListenerDetail error, %v\n", err)
+		return "", perrors.WithMessage(err, "BizGetListenerDetail error")
+	}
+	return detail, nil
 }
 
 // BRUpdate
@@ -457,6 +516,14 @@ func getResourceKey(path string, unpublished bool) string {
 		return getUnpublishedRootPath(Resources) + "/" + path
 	}
 	return getRootPath(Resources) + "/" + path
+}
+
+func getClusterKey(path string) string {
+	return getRootPath(Clusters) + "/" + path
+}
+
+func getListenerKey(path string) string {
+	return getRootPath(Listeners) + "/" + path
 }
 
 func getPluginRatelimitKey(unpublished bool) string {
@@ -492,6 +559,10 @@ func getMethodKey(path string, method string, unpublished bool) string {
 // create method, No need to judge whether to publish or not
 func getResourceId() int {
 	return loopGetId(getRootPath(ResourceID))
+}
+
+func getClusterId() int {
+	return loopGetId(getRootPath(ClusterID))
 }
 
 func getMethodId() int {
@@ -559,4 +630,12 @@ func getUnpublishedRootPath(key string) string {
 
 func getCheckResourceRegexp() *regexp.Regexp {
 	return regexp.MustCompile(".+/resources/[^/]+/?$")
+}
+
+func getCheckClusterRegexp() *regexp.Regexp {
+	return regexp.MustCompile(".+/clusters/[^/]+/?$")
+}
+
+func getCheckListenerRegexp() *regexp.Regexp {
+	return regexp.MustCompile(".+/listeners/[^/]+/?$")
 }

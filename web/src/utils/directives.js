@@ -17,15 +17,15 @@
 import Vue from 'vue';
 import { getLocalStorage } from '@/utils/auth'
 
-//权限功能点检验方法
+// account permission check
 Vue.prototype.$_has = function({rights}) {
 //debugger
-    let operatorInfo = getLocalStorage('operatorInfo');      
+    let operatorInfo = getLocalStorage('operatorInfo');
     let permission = operatorInfo.rights ? operatorInfo.rights.split(',') : [];
     let resources = [];
     let result = false;
 
-    //提取权限数据
+    // get current acccount role
     if(Array.isArray(rights)){
         rights.forEach((e) => {
         resources = resources.concat([e]);
@@ -33,7 +33,7 @@ Vue.prototype.$_has = function({rights}) {
     }else{
       resources = resources.concat([rights.split(',')]);
     }
-    //校验权限
+    // auth check
     resources.map((p) => {
       if(typeof p != 'string'){
         p = p.toString();
@@ -46,11 +46,11 @@ Vue.prototype.$_has = function({rights}) {
     return result
 
 }
-//账号权限指令
+// account permission check
 Vue.directive('has',{
     bind: (el, binding) => {},
     inserted:(el, binding) => {
-      
+
       if(!Vue.prototype.$_has(binding.value)) {
         el.parentNode.removeChild(el);
       }

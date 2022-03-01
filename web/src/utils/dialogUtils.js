@@ -38,11 +38,11 @@ export function loginTimeout() {
         showClose: false
     }).then(() => {
         store.dispatch('FedLogOut').then(() => {
-            location.reload()// 为了重新实例化vue-router对象 避免bug
+            location.reload() // reload vue-router
         })
     }).catch(e => {
         store.dispatch('FedLogOut').then(() => {
-            location.reload()// 为了重新实例化vue-router对象 避免bug
+            location.reload() // reload vue-router
         })
     })
 }
@@ -50,8 +50,8 @@ export function loginTimeout() {
 export const loadding = {
     data() {
         return {
-            //loading显示文本
-            progressStr: '加载中，请稍候...',
+            // loading content
+            progressStr: '加载中, 请稍候...',
         }
     },
     methods: {
@@ -59,9 +59,9 @@ export const loadding = {
             'setCustomerInfo',
             'setVehicleInfo'
         ]),
-        /**打开loading
-         *@param progressStr 提示信息
-         * @param timeout 超时时间：单位毫秒，默认10000（10秒）
+        /** open loading
+         * @param progressStr notify content
+         * @param timeout default timeout is 10s
          */
         startLoading: function (progressStr = null, timeout = 10000) {
             // console.log(this,this.progressStr)
@@ -75,18 +75,18 @@ export const loadding = {
                 text: this.progressStr,
                 background: 'rgba(0, 0, 0, 0.7)'
             })
-            //10秒后自动关闭
+            // auto close after 10 seconds
             setTimeout(() => {
                 this.endLoading()
             }, timeout)
         },
-        //关闭结束loading
+        // close loading
         endLoading: function () {
             if (this.loadingObj !== undefined && this.loadingObj !== null) {
                 this.loadingObj.close();
             }
         },
-        //设置loading字符串，如果有需要的话
+        // setting loading content
         setLoadingText: function (progressStr) {
             console.log(this, this.progressStr, progressStr)
             if (this.loadingObj !== undefined && this.loadingObj !== null) {

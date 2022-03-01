@@ -19,7 +19,7 @@ redis:
 # system configuration
 system:
   env: 'public'
-  addr: 8080
+  addr: 8081
   db-type: 'mysql'
 
 # mysql connect configuration

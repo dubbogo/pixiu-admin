@@ -49,11 +49,6 @@ func (a *AdminBootstrap) GetPath() string {
 	return a.EtcdConfig.Path
 }
 
-//// GetMysqlConfig get mysql config
-//func (a *AdminBootstrap) GetMysqlConfig() (string, string, string, string, string) {
-//	return a.MysqlConfig.Username, a.MysqlConfig.Password, a.MysqlConfig.Host, a.MysqlConfig.Port, a.MysqlConfig.Dbname
-//}
-
 // ServerConfig admin http server config
 type ServerConfig struct {
 	Address string `yaml:"address" json:"address" mapstructure:"address"`
